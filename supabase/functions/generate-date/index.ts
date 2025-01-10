@@ -16,6 +16,11 @@ serve(async (req) => {
     const { formData } = await req.json();
     console.log('Received form data:', formData);
 
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
     const systemPrompt = `You are a helpful date night planner. Generate a creative and detailed date idea based on the following criteria. Include specific activities, estimated timing, and any preparation needed. Format the response in a clear, easy-to-read way.`;
 
     const userPrompt = `Create a date plan with these preferences:
@@ -26,10 +31,12 @@ serve(async (req) => {
     - Your Love Language: ${formData.yourLoveLanguage}
     - Partner's Love Language: ${formData.partnerLoveLanguage}`;
 
+    console.log('Sending request to OpenAI with prompts:', { systemPrompt, userPrompt });
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
