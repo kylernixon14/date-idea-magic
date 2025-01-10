@@ -38,13 +38,30 @@ export function DateGenerator() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    setDateIdea(null); // Reset previous date idea
+    
     try {
+      console.log('Submitting form values:', values);
       const { data, error } = await supabase.functions.invoke('generate-date', {
         body: { formData: values },
       });
 
-      if (error) throw error;
+      console.log('Response from generate-date:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      if (!data?.dateIdea) {
+        throw new Error('No date idea was generated');
+      }
+
       setDateIdea(data.dateIdea);
+      toast({
+        title: "Success!",
+        description: "Your perfect date idea has been generated.",
+      });
     } catch (error) {
       console.error('Error generating date idea:', error);
       toast({
@@ -93,11 +110,15 @@ export function DateGenerator() {
         </form>
       </Form>
 
-      {dateIdea && (
+      {(dateIdea || isLoading) && (
         <Card className="mt-8">
           <CardContent className="pt-6">
             <h2 className="text-xl font-semibold mb-4">Your Perfect Date Idea</h2>
-            <div className="whitespace-pre-wrap">{dateIdea}</div>
+            {isLoading ? (
+              <p className="text-muted-foreground">Generating your perfect date idea...</p>
+            ) : (
+              <div className="prose max-w-none whitespace-pre-wrap">{dateIdea}</div>
+            )}
           </CardContent>
         </Card>
       )}
