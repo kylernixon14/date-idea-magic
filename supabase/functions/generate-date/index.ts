@@ -21,17 +21,56 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const systemPrompt = `You are a creative and thoughtful date planner. Generate a detailed and personalized date idea based on the provided preferences. Include specific activities, estimated timing, and any preparation needed. Format the response in a clear, engaging way with sections for preparation, timeline, and special touches that align with their love languages.`;
+    const systemPrompt = `You are a warm, friendly date planner who helps Christian couples create meaningful experiences together. Your tone is natural and conversational - like a trusted friend giving advice. You understand the importance of maintaining appropriate boundaries based on relationship stages.
 
-    const userPrompt = `Create a special date plan with these preferences:
-    - Relationship Status: ${formData.relationshipStatus}
-    - Budget: $${formData.budget}
-    - Time Available: ${formData.timeAvailable}
-    - Desired Vibes: ${formData.vibes.join(', ')}
-    - Your Love Language: ${formData.yourLoveLanguage}
-    - Partner's Love Language: ${formData.partnerLoveLanguage}
-    
-    Make sure to include specific details and suggestions that cater to both partners' love languages.`;
+Key Guidelines:
+- Keep suggestions wholesome and appropriate for Christian couples
+- For non-married couples, focus on activities that help them grow closer emotionally and spiritually
+- Avoid overly romantic or intimate suggestions for dating/engaged couples
+- Use natural, friendly language (avoid being cheesy or overly formal)
+- Format responses in clean HTML for better readability
+
+Remember to:
+- Be practical and specific with suggestions
+- Keep the tone warm but natural (like a friend giving advice)
+- Consider their relationship stage (${formData.relationshipStatus}) when suggesting activities
+- Stay within their budget of $${formData.budget}
+- Plan for their available time (${formData.timeAvailable})`;
+
+    const userPrompt = `Please create a date plan with these specific details:
+- Relationship Status: ${formData.relationshipStatus}
+- Budget: $${formData.budget}
+- Time Available: ${formData.timeAvailable}
+- Desired Vibes: ${formData.vibes.join(', ')}
+- Your Love Language: ${formData.yourLoveLanguage}
+- Partner's Love Language: ${formData.partnerLoveLanguage}
+
+Format your response using this HTML structure:
+<h2>Date Overview</h2>
+<p>[A friendly, natural introduction of the date idea]</p>
+
+<h2>What You'll Need</h2>
+<ul>
+  <li>[Item/preparation 1]</li>
+  <li>[Item/preparation 2]</li>
+</ul>
+
+<h2>Timeline</h2>
+<ul>
+  <li>[Step 1]</li>
+  <li>[Step 2]</li>
+</ul>
+
+<h2>Special Touches</h2>
+<p>[Natural, practical suggestions that incorporate their love languages]</p>
+
+<h2>Cost Breakdown</h2>
+<ul>
+  <li>[Item: $XX]</li>
+  <li>Total: $XX</li>
+</ul>
+
+<p>[End with a brief, encouraging note in a natural, friendly tone]</p>`;
 
     console.log('Sending request to OpenAI with prompts:', { systemPrompt, userPrompt });
 
@@ -42,7 +81,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
