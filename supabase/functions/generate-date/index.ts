@@ -21,15 +21,17 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const systemPrompt = `You are a helpful date night planner. Generate a creative and detailed date idea based on the following criteria. Include specific activities, estimated timing, and any preparation needed. Format the response in a clear, easy-to-read way.`;
+    const systemPrompt = `You are a creative and thoughtful date planner. Generate a detailed and personalized date idea based on the provided preferences. Include specific activities, estimated timing, and any preparation needed. Format the response in a clear, engaging way with sections for preparation, timeline, and special touches that align with their love languages.`;
 
-    const userPrompt = `Create a date plan with these preferences:
+    const userPrompt = `Create a special date plan with these preferences:
     - Relationship Status: ${formData.relationshipStatus}
     - Budget: $${formData.budget}
     - Time Available: ${formData.timeAvailable}
     - Desired Vibes: ${formData.vibes.join(', ')}
     - Your Love Language: ${formData.yourLoveLanguage}
-    - Partner's Love Language: ${formData.partnerLoveLanguage}`;
+    - Partner's Love Language: ${formData.partnerLoveLanguage}
+    
+    Make sure to include specific details and suggestions that cater to both partners' love languages.`;
 
     console.log('Sending request to OpenAI with prompts:', { systemPrompt, userPrompt });
 
@@ -40,7 +42,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4-turbo-preview',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
