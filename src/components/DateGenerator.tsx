@@ -117,7 +117,10 @@ export function DateGenerator() {
             {isLoading ? (
               <p className="text-muted-foreground">Generating your perfect date idea...</p>
             ) : (
-              <div className="prose max-w-none whitespace-pre-wrap">{dateIdea}</div>
+              <div 
+                className="prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: dateIdea || '' }}
+              />
             )}
           </CardContent>
         </Card>
