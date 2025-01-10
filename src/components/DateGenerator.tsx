@@ -60,6 +60,30 @@ export function DateGenerator() {
     const content = document.getElementById('date-idea-content');
     if (!content) return;
 
+    // Create a wrapper div for the PDF content
+    const pdfContent = document.createElement('div');
+    
+    // Add the header image
+    const headerImg = document.createElement('img');
+    headerImg.src = '/lovable-uploads/e3bf33d1-9a32-48aa-b380-008f0f5b9562.png';
+    headerImg.style.width = '100%';
+    headerImg.style.maxWidth = '700px';
+    headerImg.style.height = 'auto';
+    headerImg.style.marginBottom = '20px';
+    pdfContent.appendChild(headerImg);
+
+    // Add the date idea content
+    pdfContent.appendChild(content.cloneNode(true));
+
+    // Add the footer text
+    const footer = document.createElement('div');
+    footer.style.marginTop = '20px';
+    footer.style.textAlign = 'center';
+    footer.style.color = 'rgba(0, 0, 0, 0.5)';
+    footer.style.fontSize = '12px';
+    footer.textContent = 'loveyourfirstyear.com';
+    pdfContent.appendChild(footer);
+
     const opt = {
       margin: 1,
       filename: 'your-perfect-date.pdf',
@@ -68,7 +92,7 @@ export function DateGenerator() {
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
     };
 
-    html2pdf().set(opt).from(content).save();
+    html2pdf().set(opt).from(pdfContent).save();
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
