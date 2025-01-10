@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 import { Cloud, Sun, Leaf, Snowflake } from "lucide-react";
 
 const seasonOptions = [
-  { id: "summer", label: "Summer", icon: Sun, color: "#e45e41" },
-  { id: "fall", label: "Fall", icon: Leaf, color: "#c6a059" },
-  { id: "winter", label: "Winter", icon: Snowflake, color: "#c8d9ec" },
-  { id: "spring", label: "Spring", icon: Cloud, color: "#bec69f" },
+  { id: "summer", label: "Summer", icon: Sun, color: "#e45e4180" },
+  { id: "fall", label: "Fall", icon: Leaf, color: "#c6a05980" },
+  { id: "winter", label: "Winter", icon: Snowflake, color: "#c8d9ec80" },
+  { id: "spring", label: "Spring", icon: Cloud, color: "#bec69f80" },
 ] as const;
 
 export function SeasonSelector({ form }: { form: any }) {
@@ -31,7 +31,7 @@ export function SeasonSelector({ form }: { form: any }) {
                     "w-full justify-start gap-2 border-2",
                     isSelected && {
                       'bg-[var(--season-bg)]': true,
-                      'border-black': true,
+                      'border-[var(--season-bg)]': true,
                       'text-black': true,
                     },
                     !isSelected && "hover:bg-gray-100"

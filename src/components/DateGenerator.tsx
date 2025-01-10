@@ -6,15 +6,13 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { RelationshipStatus } from "./date-generator/RelationshipStatus";
 import { BudgetSlider } from "./date-generator/BudgetSlider";
 import { TimeSelector } from "./date-generator/TimeSelector";
 import { VibeSelector } from "./date-generator/VibeSelector";
 import { LoveLanguageSelector } from "./date-generator/LoveLanguageSelector";
 import { SeasonSelector } from "./date-generator/SeasonSelector";
-import html2pdf from 'html2pdf.js';
-import { Download } from "lucide-react";
+import { DateIdeaDisplay } from "./date-generator/DateIdeaDisplay";
 
 const formSchema = z.object({
   relationshipStatus: z.enum(["dating", "engaged", "married"]),
@@ -32,7 +30,6 @@ export function DateGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Load font
   useEffect(() => {
     const loadFont = async () => {
       const font = new FontFace(
@@ -59,45 +56,6 @@ export function DateGenerator() {
     },
   });
 
-  const handleDownloadPDF = () => {
-    const content = document.getElementById('date-idea-content');
-    if (!content) return;
-
-    // Create a wrapper div for the PDF content
-    const pdfContent = document.createElement('div');
-    
-    // Add the header image
-    const headerImg = document.createElement('img');
-    headerImg.src = '/lovable-uploads/e3bf33d1-9a32-48aa-b380-008f0f5b9562.png';
-    headerImg.style.width = '100%';
-    headerImg.style.maxWidth = '700px';
-    headerImg.style.height = 'auto';
-    headerImg.style.marginBottom = '20px';
-    pdfContent.appendChild(headerImg);
-
-    // Add the date idea content
-    pdfContent.appendChild(content.cloneNode(true));
-
-    // Add the footer text
-    const footer = document.createElement('div');
-    footer.style.marginTop = '20px';
-    footer.style.textAlign = 'center';
-    footer.style.color = 'rgba(0, 0, 0, 0.5)';
-    footer.style.fontSize = '12px';
-    footer.textContent = 'loveyourfirstyear.com';
-    pdfContent.appendChild(footer);
-
-    const opt = {
-      margin: 1,
-      filename: 'your-perfect-date.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-    };
-
-    html2pdf().set(opt).from(pdfContent).save();
-  };
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setDateIdea(null);
@@ -105,7 +63,6 @@ export function DateGenerator() {
     try {
       console.log('Submitting form values:', values);
 
-      // Check rate limit
       const { count } = await supabase
         .from('date_generations')
         .select('*', { count: 'exact' })
@@ -115,7 +72,6 @@ export function DateGenerator() {
         throw new Error('You have reached the limit of 5 date ideas per 24 hours. Please try again later.');
       }
 
-      // Record the generation attempt
       const { error: insertError } = await supabase
         .from('date_generations')
         .insert([{ ip_address: await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip) }]);
@@ -195,32 +151,7 @@ export function DateGenerator() {
       </Form>
 
       {(dateIdea || isLoading) && (
-        <Card className="mt-8">
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Your Perfect Date Idea</h2>
-              {dateIdea && (
-                <Button
-                  onClick={handleDownloadPDF}
-                  variant="outline"
-                  className="bg-custom-orange text-white hover:bg-custom-orange/90"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download your date
-                </Button>
-              )}
-            </div>
-            {isLoading ? (
-              <p className="text-muted-foreground">Generating your perfect date idea...</p>
-            ) : (
-              <div 
-                id="date-idea-content"
-                className="prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: dateIdea || '' }}
-              />
-            )}
-          </CardContent>
-        </Card>
+        <DateIdeaDisplay dateIdea={dateIdea} isLoading={isLoading} />
       )}
     </div>
   );
