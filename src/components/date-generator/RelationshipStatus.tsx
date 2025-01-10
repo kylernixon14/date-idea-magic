@@ -1,11 +1,11 @@
 import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Heart, Ring, Home } from "lucide-react";
+import { Heart, GemRing, Home } from "lucide-react";
 
 const options = [
   { value: "dating", label: "Dating", icon: Heart },
-  { value: "engaged", label: "Engaged", icon: Ring },
+  { value: "engaged", label: "Engaged", icon: GemRing },
   { value: "married", label: "Married", icon: Home },
 ] as const;
 
