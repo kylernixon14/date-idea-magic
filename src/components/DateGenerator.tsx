@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -12,6 +12,8 @@ import { BudgetSlider } from "./date-generator/BudgetSlider";
 import { TimeSelector } from "./date-generator/TimeSelector";
 import { VibeSelector } from "./date-generator/VibeSelector";
 import { LoveLanguageSelector } from "./date-generator/LoveLanguageSelector";
+import html2pdf from 'html2pdf.js';
+import { Download } from "lucide-react";
 
 const formSchema = z.object({
   relationshipStatus: z.enum(["dating", "engaged", "married"]),
@@ -28,6 +30,24 @@ export function DateGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Load font
+  useEffect(() => {
+    const loadFont = async () => {
+      const font = new FontFace(
+        'Plus Jakarta Sans',
+        'url(https://fonts.gstatic.com/s/plusjakartasans/v8/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_KU7NSg.woff2)'
+      );
+      try {
+        await font.load();
+        document.fonts.add(font);
+        console.log('Plus Jakarta Sans font loaded successfully');
+      } catch (error) {
+        console.error('Error loading Plus Jakarta Sans font:', error);
+      }
+    };
+    loadFont();
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,9 +56,24 @@ export function DateGenerator() {
     },
   });
 
+  const handleDownloadPDF = () => {
+    const content = document.getElementById('date-idea-content');
+    if (!content) return;
+
+    const opt = {
+      margin: 1,
+      filename: 'your-perfect-date.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    };
+
+    html2pdf().set(opt).from(content).save();
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setDateIdea(null); // Reset previous date idea
+    setDateIdea(null);
     
     try {
       console.log('Submitting form values:', values);
@@ -75,7 +110,7 @@ export function DateGenerator() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-8">
+    <div className="max-w-2xl mx-auto p-6 space-y-8 font-jakarta text-black">
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">Date Night Generator</h1>
         <p className="text-muted-foreground">
@@ -113,11 +148,24 @@ export function DateGenerator() {
       {(dateIdea || isLoading) && (
         <Card className="mt-8">
           <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold mb-4">Your Perfect Date Idea</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Your Perfect Date Idea</h2>
+              {dateIdea && (
+                <Button
+                  onClick={handleDownloadPDF}
+                  variant="outline"
+                  className="bg-custom-orange text-white hover:bg-custom-orange/90"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download your date
+                </Button>
+              )}
+            </div>
             {isLoading ? (
               <p className="text-muted-foreground">Generating your perfect date idea...</p>
             ) : (
               <div 
+                id="date-idea-content"
                 className="prose max-w-none"
                 dangerouslySetInnerHTML={{ __html: dateIdea || '' }}
               />
