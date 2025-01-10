@@ -52,11 +52,15 @@ serve(async (req) => {
     if (!response.ok) {
       const error = await response.json();
       console.error('OpenAI API error:', error);
-      throw new Error('Failed to generate date idea');
+      throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
     console.log('OpenAI response:', data);
+
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('No content in OpenAI response');
+    }
 
     return new Response(JSON.stringify({ 
       dateIdea: data.choices[0].message.content 
