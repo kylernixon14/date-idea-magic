@@ -12,6 +12,7 @@ import { BudgetSlider } from "./date-generator/BudgetSlider";
 import { TimeSelector } from "./date-generator/TimeSelector";
 import { VibeSelector } from "./date-generator/VibeSelector";
 import { LoveLanguageSelector } from "./date-generator/LoveLanguageSelector";
+import { SeasonSelector } from "./date-generator/SeasonSelector";
 import html2pdf from 'html2pdf.js';
 import { Download } from "lucide-react";
 
@@ -22,6 +23,7 @@ const formSchema = z.object({
   vibes: z.array(z.string()).min(1, "Please select at least one vibe"),
   yourLoveLanguage: z.string(),
   partnerLoveLanguage: z.string(),
+  season: z.enum(["summer", "fall", "winter", "spring"]),
 });
 
 export function DateGenerator() {
@@ -53,6 +55,7 @@ export function DateGenerator() {
     defaultValues: {
       budget: 50,
       vibes: [],
+      season: "summer",
     },
   });
 
@@ -101,6 +104,27 @@ export function DateGenerator() {
     
     try {
       console.log('Submitting form values:', values);
+
+      // Check rate limit
+      const { count } = await supabase
+        .from('date_generations')
+        .select('*', { count: 'exact' })
+        .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+      if (count && count >= 5) {
+        throw new Error('You have reached the limit of 5 date ideas per 24 hours. Please try again later.');
+      }
+
+      // Record the generation attempt
+      const { error: insertError } = await supabase
+        .from('date_generations')
+        .insert([{ ip_address: await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip) }]);
+
+      if (insertError) {
+        console.error('Error recording date generation:', insertError);
+        throw insertError;
+      }
+
       const { data, error } = await supabase.functions.invoke('generate-date', {
         body: { formData: values },
       });
@@ -125,7 +149,7 @@ export function DateGenerator() {
       console.error('Error generating date idea:', error);
       toast({
         title: "Error",
-        description: "Failed to generate date idea. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate date idea. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -152,6 +176,7 @@ export function DateGenerator() {
           />
           <TimeSelector form={form} />
           <VibeSelector form={form} />
+          <SeasonSelector form={form} />
           <LoveLanguageSelector 
             form={form} 
             label="What's your love language?" 

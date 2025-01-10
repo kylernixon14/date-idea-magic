@@ -12,7 +12,7 @@ export function BudgetSlider({ form, sliderValue, setSliderValue }: {
       name="budget"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>What's your budget?</FormLabel>
+          <FormLabel className="font-semibold">What's your budget?</FormLabel>
           <FormControl>
             <div className="space-y-3">
               <Slider

@@ -19,7 +19,7 @@ export function VibeSelector({ form }: { form: any }) {
       name="vibes"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>What's the vibe you're looking for?</FormLabel>
+          <FormLabel className="font-semibold">What's the vibe you're looking for?</FormLabel>
           <div className="grid grid-cols-2 gap-4 mt-2">
             {vibeOptions.map((vibe) => {
               const Icon = vibe.icon;
@@ -31,7 +31,7 @@ export function VibeSelector({ form }: { form: any }) {
                   variant={isSelected ? "default" : "outline"}
                   className={cn(
                     "w-full justify-start gap-2 border-2",
-                    isSelected && "bg-primary text-primary-foreground"
+                    isSelected && "bg-primary text-primary-foreground border-black"
                   )}
                   onClick={() => {
                     const value = field.value || [];

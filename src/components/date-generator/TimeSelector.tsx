@@ -15,7 +15,7 @@ export function TimeSelector({ form }: { form: any }) {
       name="timeAvailable"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>How much time do you have?</FormLabel>
+          <FormLabel className="font-semibold">How much time do you have?</FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>

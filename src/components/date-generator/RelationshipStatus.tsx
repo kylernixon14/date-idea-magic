@@ -15,7 +15,7 @@ export function RelationshipStatus({ form }: { form: any }) {
       name="relationshipStatus"
       render={({ field }) => (
         <FormItem className="space-y-3">
-          <FormLabel>What's your relationship status?</FormLabel>
+          <FormLabel className="font-semibold">What's your relationship status?</FormLabel>
           <FormControl>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {options.map((option) => (

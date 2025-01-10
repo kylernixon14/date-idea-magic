@@ -29,13 +29,15 @@ Key Guidelines:
 - Avoid overly romantic or intimate suggestions for dating/engaged couples
 - Use natural, friendly language (avoid being cheesy or overly formal)
 - Format responses in clean HTML for better readability
+- Consider the current season (${formData.season}) when suggesting activities and make them seasonally appropriate
 
 Remember to:
 - Be practical and specific with suggestions
 - Keep the tone warm but natural (like a friend giving advice)
 - Consider their relationship stage (${formData.relationshipStatus}) when suggesting activities
 - Stay within their budget of $${formData.budget}
-- Plan for their available time (${formData.timeAvailable})`;
+- Plan for their available time (${formData.timeAvailable})
+- Include seasonal elements and activities that are particularly enjoyable during ${formData.season}`;
 
     const userPrompt = `Please create a date plan with these specific details:
 - Relationship Status: ${formData.relationshipStatus}
