@@ -8,6 +8,9 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent } from "@/components/ui/card";
 
 const vibeOptions = [
   { id: "adventure", label: "Adventure" },
@@ -37,6 +40,9 @@ const formSchema = z.object({
 
 export function DateGenerator() {
   const [sliderValue, setSliderValue] = useState([50]);
+  const [dateIdea, setDateIdea] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,9 +52,25 @@ export function DateGenerator() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // We'll implement the OpenAI integration in the next step
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-date', {
+        body: { formData: values },
+      });
+
+      if (error) throw error;
+      setDateIdea(data.dateIdea);
+    } catch (error) {
+      console.error('Error generating date idea:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate date idea. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -244,9 +266,20 @@ export function DateGenerator() {
             )}
           />
 
-          <Button type="submit" className="w-full">Generate Date Idea</Button>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Generating..." : "Generate Date Idea"}
+          </Button>
         </form>
       </Form>
+
+      {dateIdea && (
+        <Card className="mt-8">
+          <CardContent className="pt-6">
+            <h2 className="text-xl font-semibold mb-4">Your Perfect Date Idea</h2>
+            <div className="whitespace-pre-wrap">{dateIdea}</div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
