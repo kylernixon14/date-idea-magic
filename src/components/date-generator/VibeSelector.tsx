@@ -30,7 +30,7 @@ export function VibeSelector({ form }: { form: any }) {
                   type="button"
                   variant={isSelected ? "default" : "outline"}
                   className={cn(
-                    "w-full justify-start gap-2",
+                    "w-full justify-start gap-2 border-2",
                     isSelected && "bg-primary text-primary-foreground"
                   )}
                   onClick={() => {
