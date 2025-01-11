@@ -25,16 +25,31 @@ export function useDateGenerator() {
     setDateIdea(null);
     
     try {
-      console.log('Submitting form values:', values);
+      // Get user subscription status
+      const { data: { session } } = await supabase.auth.getSession();
+      let canGenerate = true;
+      let subscriptionType = 'free';
 
-      const { count } = await supabase
-        .from('date_generations')
-        .select('*', { count: 'exact' })
-        .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+      if (session?.user) {
+        const { data: subscription } = await supabase
+          .from('user_subscriptions')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
 
-      if (count && count >= 100) {
-        throw new Error('You have reached the limit of 100 date ideas per 24 hours. Please try again later.');
+        if (subscription) {
+          subscriptionType = subscription.subscription_type;
+          if (subscriptionType === 'free' && subscription.date_generations_count >= 5) {
+            canGenerate = false;
+          }
+        }
       }
+
+      if (!canGenerate) {
+        throw new Error('You have reached the limit of 5 free date generations. Please upgrade to continue.');
+      }
+
+      console.log('Submitting form values:', values);
 
       const { data: generatedData, error } = await supabase.functions.invoke('generate-date', {
         body: { formData: values },
@@ -51,16 +66,19 @@ export function useDateGenerator() {
         throw new Error('No date idea was generated');
       }
 
-      const { error: insertError } = await supabase
-        .from('date_generations')
-        .insert([{ 
-          ip_address: await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip),
-          content: generatedData.dateIdea
-        }]);
+      // Update generation count for free users
+      if (session?.user && subscriptionType === 'free') {
+        const { error: updateError } = await supabase
+          .from('user_subscriptions')
+          .update({ 
+            date_generations_count: subscription.date_generations_count + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', session.user.id);
 
-      if (insertError) {
-        console.error('Error recording date generation:', insertError);
-        throw insertError;
+        if (updateError) {
+          console.error('Error updating generation count:', updateError);
+        }
       }
 
       setDateIdea(generatedData.dateIdea);
