@@ -53,20 +53,34 @@ export const useDateGenerator = () => {
         }
       }
 
-      const response = await fetch("/api/generate-date", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ formData }),
+      console.log('Calling generate-date function with formData:', formData);
+      
+      const { data, error } = await supabase.functions.invoke('generate-date', {
+        body: { formData }
       });
 
-      if (!response.ok) {
+      if (error) {
+        console.error('Error from generate-date function:', error);
         throw new Error("Failed to generate date");
       }
 
-      const data = await response.json();
+      console.log('Response from generate-date function:', data);
       setDateIdea(data.dateIdea);
+      
+      // Update the generation count in the database
+      if (session?.user) {
+        const { error: updateError } = await supabase
+          .from("user_subscriptions")
+          .update({ 
+            date_generations_count: (subscriptionData?.date_generations_count || 0) + 1 
+          })
+          .eq("user_id", session.user.id);
+          
+        if (updateError) {
+          console.error('Error updating generation count:', updateError);
+        }
+      }
+
       return data;
     } catch (error) {
       console.error("Error generating date:", error);
