@@ -68,8 +68,8 @@ export function DateGenerator() {
         .select('*', { count: 'exact' })
         .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
-      if (count && count >= 5) {
-        throw new Error('You have reached the limit of 5 date ideas per 24 hours. Please try again later.');
+      if (count && count >= 100) {
+        throw new Error('You have reached the limit of 100 date ideas per 24 hours. Please try again later.');
       }
 
       const { error: insertError } = await supabase
