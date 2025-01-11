@@ -31,7 +31,7 @@ For non-married couples, prioritize activities that build emotional connection a
 Be thoughtful about blending both partners' love languages in natural, meaningful ways.
 Add personal touches that feel intentional and heartfelt, making each date stand out.
 Stay mindful of their budget, offering affordable options that still feel special and thoughtful.
-Use seasonal considerations (e.g., weather-friendly activities) without limiting creativity to only seasonal ideas.
+Consider the current weather conditions and suggest appropriate indoor/outdoor activities.
 Avoid cheesy, over-the-top phrasing. Instead, write as though you're speaking naturally to a friend—keep it real and grounded.
 Be specific and actionable—don't just say "go out to eat" or "take a walk"; give detailed ideas that reflect thoughtfulness.
 Use phrases and descriptions that are easy to relate to and reflect real-life scenarios.
@@ -51,9 +51,9 @@ Time Available: ${formData.timeAvailable}
 Desired Vibes: ${formData.vibes.join(', ')}
 Your Love Language: ${formData.yourLoveLanguage}
 Partner's Love Language: ${formData.partnerLoveLanguage}
-Season (for weather considerations): ${formData.season}
+Current Weather: ${formData.weather}
 
-Craft a date that feels thoughtful and unique, blending their love languages into the experience in meaningful and creative ways. Focus on realistic, specific details and avoid generic suggestions.
+Craft a date that feels thoughtful and unique, blending their love languages into the experience in meaningful and creative ways. Focus on realistic, specific details and avoid generic suggestions. Make sure the activities are appropriate for the current weather conditions.
 
 Format your response using this HTML structure:
 <h2>Your Personalized Date Experience</h2>

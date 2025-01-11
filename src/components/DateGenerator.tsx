@@ -11,7 +11,7 @@ import { BudgetSlider } from "./date-generator/BudgetSlider";
 import { TimeSelector } from "./date-generator/TimeSelector";
 import { VibeSelector } from "./date-generator/VibeSelector";
 import { LoveLanguageSelector } from "./date-generator/LoveLanguageSelector";
-import { SeasonSelector } from "./date-generator/SeasonSelector";
+import { WeatherSelector } from "./date-generator/WeatherSelector";
 import { DateIdeaDisplay } from "./date-generator/DateIdeaDisplay";
 
 const formSchema = z.object({
@@ -21,7 +21,7 @@ const formSchema = z.object({
   vibes: z.array(z.string()).min(1, "Please select at least one vibe"),
   yourLoveLanguage: z.string(),
   partnerLoveLanguage: z.string(),
-  season: z.enum(["summer", "fall", "winter", "spring"]),
+  weather: z.enum(["sunny", "cloudy", "rainy", "snowy", "hot", "cold"]),
 });
 
 export function DateGenerator() {
@@ -52,7 +52,7 @@ export function DateGenerator() {
     defaultValues: {
       budget: 50,
       vibes: [],
-      season: "summer",
+      weather: "sunny",
     },
   });
 
@@ -132,7 +132,7 @@ export function DateGenerator() {
           />
           <TimeSelector form={form} />
           <VibeSelector form={form} />
-          <SeasonSelector form={form} />
+          <WeatherSelector form={form} />
           <LoveLanguageSelector 
             form={form} 
             label="What's your love language?" 
