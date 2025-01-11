@@ -32,7 +32,13 @@ export const Header = () => {
   return (
     <header className="border-b">
       <div className="flex h-16 items-center px-4 justify-between">
-        <div className="font-semibold">DateGen</div>
+        <Link to="/" className="flex items-center">
+          <img 
+            src="/lovable-uploads/4b7a973f-7bee-47af-9ea8-1d6599806289.png" 
+            alt="DateGen Logo" 
+            className="h-8"
+          />
+        </Link>
         <div className="flex items-center gap-4">
           {showUpgrade && (
             <>
@@ -52,4 +58,4 @@ export const Header = () => {
       </div>
     </header>
   );
-}
+};
