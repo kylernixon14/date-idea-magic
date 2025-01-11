@@ -29,6 +29,7 @@ export function DateGeneratorForm({ onSubmit, isLoading }: DateGeneratorFormProp
       timeOfDay: undefined,
       location: undefined,
       energyLevel: undefined,
+      hobbies: [],
     },
   });
 

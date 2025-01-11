@@ -5,6 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { HobbiesSelector } from "./HobbiesSelector";
 
 const timeOptions = [
   { value: "morning", label: "Morning" },
@@ -134,6 +135,8 @@ export function AdvancedOptions({ form }: { form: any }) {
             )}
           />
         </div>
+
+        <HobbiesSelector form={form} />
       </CollapsibleContent>
     </Collapsible>
   );
