@@ -77,23 +77,25 @@ const BookmarkedDates = () => {
         ) : dates.length === 0 ? (
           <p>You haven't bookmarked any dates yet.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {dates.map((date) => (
-              <Card key={date.id}>
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-start gap-4">
+              <Card key={date.id} className="h-full">
+                <CardContent className="p-4">
+                  <div className="flex flex-col h-full">
                     <div
-                      className="prose flex-1"
+                      className="prose prose-sm flex-1 mb-3"
                       dangerouslySetInnerHTML={{ __html: date.date_idea }}
                     />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(date.id)}
-                      className="hover:bg-transparent"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex justify-end">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(date.id)}
+                        className="hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
