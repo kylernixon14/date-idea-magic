@@ -1,35 +1,9 @@
-import { useState, useEffect } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { RelationshipStatus } from "./date-generator/RelationshipStatus";
-import { BudgetSlider } from "./date-generator/BudgetSlider";
-import { TimeSelector } from "./date-generator/TimeSelector";
-import { VibeSelector } from "./date-generator/VibeSelector";
-import { LoveLanguageSelector } from "./date-generator/LoveLanguageSelector";
-import { WeatherSelector } from "./date-generator/WeatherSelector";
+import { useEffect } from "react";
+import { DateGeneratorForm } from "./date-generator/DateGeneratorForm";
 import { DateIdeaDisplay } from "./date-generator/DateIdeaDisplay";
-
-const formSchema = z.object({
-  relationshipStatus: z.enum(["dating", "engaged", "married"]),
-  budget: z.number().min(0).max(250),
-  timeAvailable: z.enum(["1-2 hours", "half-day", "full-day", "weekend"]),
-  vibes: z.array(z.string()).min(1, "Please select at least one vibe"),
-  yourLoveLanguage: z.string(),
-  partnerLoveLanguage: z.string(),
-  weather: z.enum(["sunny", "cloudy", "rainy", "snowy", "hot", "cold"]),
-});
+import { useDateGenerator } from "@/hooks/useDateGenerator";
 
 export function DateGenerator() {
-  const [sliderValue, setSliderValue] = useState([50]);
-  const [dateIdea, setDateIdea] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
   useEffect(() => {
     const loadFont = async () => {
       const font = new FontFace(
@@ -47,74 +21,7 @@ export function DateGenerator() {
     loadFont();
   }, []);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      budget: 50,
-      vibes: [],
-      weather: "sunny",
-    },
-  });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
-    setDateIdea(null);
-    
-    try {
-      console.log('Submitting form values:', values);
-
-      const { count } = await supabase
-        .from('date_generations')
-        .select('*', { count: 'exact' })
-        .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
-
-      if (count && count >= 100) {
-        throw new Error('You have reached the limit of 100 date ideas per 24 hours. Please try again later.');
-      }
-
-      const { data: generatedData, error } = await supabase.functions.invoke('generate-date', {
-        body: { formData: values },
-      });
-
-      console.log('Response from generate-date:', { generatedData, error });
-
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
-      }
-
-      if (!generatedData?.dateIdea) {
-        throw new Error('No date idea was generated');
-      }
-
-      const { error: insertError } = await supabase
-        .from('date_generations')
-        .insert([{ 
-          ip_address: await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip),
-          content: generatedData.dateIdea
-        }]);
-
-      if (insertError) {
-        console.error('Error recording date generation:', insertError);
-        throw insertError;
-      }
-
-      setDateIdea(generatedData.dateIdea);
-      toast({
-        title: "Success!",
-        description: "Your perfect date idea has been generated.",
-      });
-    } catch (error) {
-      console.error('Error generating date idea:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate date idea. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const { dateIdea, isLoading, generateDate } = useDateGenerator();
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 space-y-8 font-jakarta text-black">
@@ -125,33 +32,7 @@ export function DateGenerator() {
         </p>
       </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <RelationshipStatus form={form} />
-          <BudgetSlider 
-            form={form} 
-            sliderValue={sliderValue} 
-            setSliderValue={setSliderValue} 
-          />
-          <TimeSelector form={form} />
-          <VibeSelector form={form} />
-          <WeatherSelector form={form} />
-          <LoveLanguageSelector 
-            form={form} 
-            label="What's your love language?" 
-            name="yourLoveLanguage" 
-          />
-          <LoveLanguageSelector 
-            form={form} 
-            label="What's your partner's love language?" 
-            name="partnerLoveLanguage" 
-          />
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Generating..." : "Generate Date Idea"}
-          </Button>
-        </form>
-      </Form>
+      <DateGeneratorForm onSubmit={generateDate} isLoading={isLoading} />
 
       {(dateIdea || isLoading) && (
         <DateIdeaDisplay dateIdea={dateIdea} isLoading={isLoading} />
