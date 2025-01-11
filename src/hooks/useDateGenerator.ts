@@ -2,9 +2,23 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { z } from "zod";
+
+export const formSchema = z.object({
+  relationshipStatus: z.string(),
+  budget: z.number().min(0),
+  timeAvailable: z.string(),
+  vibes: z.array(z.string()),
+  yourLoveLanguage: z.string(),
+  partnerLoveLanguage: z.string(),
+  weather: z.string(),
+});
+
+export type DateGeneratorFormValues = z.infer<typeof formSchema>;
 
 export const useDateGenerator = () => {
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [dateIdea, setDateIdea] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
   const { data: subscriptionData } = useQuery({
@@ -23,8 +37,8 @@ export const useDateGenerator = () => {
     }
   });
 
-  const generateDate = async (formData: any) => {
-    setIsGenerating(true);
+  const generateDate = async (formData: DateGeneratorFormValues) => {
+    setIsLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -44,7 +58,7 @@ export const useDateGenerator = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ formData }),
       });
 
       if (!response.ok) {
@@ -52,6 +66,7 @@ export const useDateGenerator = () => {
       }
 
       const data = await response.json();
+      setDateIdea(data.dateIdea);
       return data;
     } catch (error) {
       console.error("Error generating date:", error);
@@ -62,12 +77,13 @@ export const useDateGenerator = () => {
       });
       return null;
     } finally {
-      setIsGenerating(false);
+      setIsLoading(false);
     }
   };
 
   return {
+    dateIdea,
     generateDate,
-    isGenerating,
+    isLoading,
   };
 };
