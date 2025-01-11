@@ -1,83 +1,99 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DateGeneratorForm } from "./date-generator/DateGeneratorForm";
 import { DateIdeaDisplay } from "./date-generator/DateIdeaDisplay";
-import { SubscriptionPlans } from "./SubscriptionPlans";
 import { useDateGenerator } from "@/hooks/useDateGenerator";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { UsageProgressBar } from "./plan-limits/UsageProgressBar";
+import { UpgradeBanner } from "./plan-limits/UpgradeBanner";
+import { UsageLimitModal } from "./plan-limits/UsageLimitModal";
+
+const MAX_FREE_GENERATIONS = 5;
 
 export function DateGenerator() {
-  const [showSubscription, setShowSubscription] = useState(false);
-  const [generationCount, setGenerationCount] = useState(0);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const { dateIdea, generateDate, isLoading } = useDateGenerator();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    const loadFont = async () => {
-      const font = new FontFace(
-        'Plus Jakarta Sans',
-        'url(https://fonts.gstatic.com/s/plusjakartasans/v8/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_KU7NSg.woff2)'
-      );
-      try {
-        await font.load();
-        document.fonts.add(font);
-        console.log('Plus Jakarta Sans font loaded successfully');
-      } catch (error) {
-        console.error('Error loading Plus Jakarta Sans font:', error);
-      }
-    };
-    loadFont();
-
-    const checkSubscription = async () => {
+  const { data: subscriptionData } = useQuery({
+    queryKey: ["subscription"],
+    queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data: subscription } = await supabase
-          .from('user_subscriptions')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
+      if (!session?.user) return null;
+      
+      const { data: subscription } = await supabase
+        .from("user_subscriptions")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .single();
+      
+      return subscription;
+    }
+  });
 
-        if (subscription?.subscription_type === 'free' && subscription?.date_generations_count >= 5) {
-          setShowSubscription(true);
-        }
-        setGenerationCount(subscription?.date_generations_count || 0);
-      }
-    };
+  const generationsUsed = subscriptionData?.date_generations_count || 0;
+  const remainingDates = MAX_FREE_GENERATIONS - generationsUsed;
+  const isFreeUser = subscriptionData?.subscription_type === "free";
 
-    checkSubscription();
-  }, []);
+  const handleSubmit = async (values: any) => {
+    if (isFreeUser && generationsUsed >= MAX_FREE_GENERATIONS) {
+      toast({
+        title: "Free Plan Limit Reached",
+        description: "Please upgrade to generate more date ideas",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const { dateIdea, isLoading, generateDate } = useDateGenerator();
+    if (isFreeUser && remainingDates <= 2) {
+      setShowLimitModal(true);
+    }
+
+    await generateDate(values);
+
+    if (isFreeUser && remainingDates === 1) {
+      toast({
+        title: "Last Generation Used!",
+        description: "Upgrade now to continue generating amazing date ideas",
+        variant: "destructive",
+      });
+    } else if (isFreeUser && remainingDates === 2) {
+      toast({
+        title: "Running Low!",
+        description: "Only 2 generations remaining on your free plan",
+        variant: "warning",
+      });
+    }
+  };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8 font-jakarta text-black">
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold">Date Night Generator</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          Answer a few questions to get your perfect date idea
-        </p>
-        {generationCount > 0 && generationCount < 5 && (
-          <p className="text-sm text-muted-foreground">
-            You have used {generationCount} of your 5 free generations
+    <div className="container max-w-6xl py-8 space-y-8">
+      <div className="max-w-xl mx-auto space-y-8">
+        <div className="space-y-4">
+          <h1 className="text-4xl font-bold text-center">Generate Your Perfect Date</h1>
+          <p className="text-muted-foreground text-center">
+            Tell us about your relationship and we'll create a personalized date idea just for you.
           </p>
-        )}
+          {isFreeUser && (
+            <div className="w-full max-w-xs mx-auto">
+              <UsageProgressBar used={generationsUsed} total={MAX_FREE_GENERATIONS} />
+            </div>
+          )}
+        </div>
+
+        <DateGeneratorForm onSubmit={handleSubmit} isLoading={isLoading} />
+        
+        {isFreeUser && <UpgradeBanner remainingDates={remainingDates} />}
       </div>
 
-      {showSubscription ? (
-        <div className="space-y-4">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold">Upgrade Your Plan</h2>
-            <p className="text-muted-foreground">
-              You've used all your free generations. Upgrade to continue generating amazing date ideas!
-            </p>
-          </div>
-          <SubscriptionPlans />
-        </div>
-      ) : (
-        <>
-          <DateGeneratorForm onSubmit={generateDate} isLoading={isLoading} />
-          {(dateIdea || isLoading) && (
-            <DateIdeaDisplay dateIdea={dateIdea} isLoading={isLoading} />
-          )}
-        </>
-      )}
+      {dateIdea && <DateIdeaDisplay dateIdea={dateIdea} isLoading={isLoading} />}
+
+      <UsageLimitModal 
+        open={showLimitModal} 
+        onOpenChange={setShowLimitModal}
+        remainingDates={remainingDates}
+      />
     </div>
   );
 }
