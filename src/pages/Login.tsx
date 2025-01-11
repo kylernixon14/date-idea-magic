@@ -41,6 +41,15 @@ const Login = () => {
       {/* Left side - Auth form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#fbfaf8] px-4 py-12">
         <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 0L24.4903 15.5097L40 20L24.4903 24.4903L20 40L15.5097 24.4903L0 20L15.5097 15.5097L20 0Z" fill="#e45e41"/>
+              </svg>
+            </div>
+            <h1 className="text-2xl font-semibold mb-2 font-jakarta">Welcome to DateGen</h1>
+            <p className="text-gray-600 font-jakarta">Sign in to your account or create a new one</p>
+          </div>
           <Auth
             supabaseClient={supabase}
             appearance={{
@@ -50,7 +59,7 @@ const Login = () => {
                   background: '#e45e41',
                   borderRadius: '4px',
                   fontFamily: 'IBM Plex Mono, monospace',
-                  '&:hover': {
+                  ':hover': {
                     background: '#d04e33',
                   }
                 },
