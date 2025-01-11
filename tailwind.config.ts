@@ -64,11 +64,12 @@ export default {
         },
         custom: {
           orange: '#e45e41',
-          tan: '#ebe6e0',
+          tan: '#fbfaf8',
         }
       },
       fontFamily: {
         jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+        mono: ['IBM Plex Mono', 'monospace'],
       },
       borderRadius: {
         lg: "var(--radius)",
