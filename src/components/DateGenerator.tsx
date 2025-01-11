@@ -72,31 +72,34 @@ export function DateGenerator() {
         throw new Error('You have reached the limit of 100 date ideas per 24 hours. Please try again later.');
       }
 
-      const { error: insertError } = await supabase
-        .from('date_generations')
-        .insert([{ ip_address: await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip) }]);
-
-      if (insertError) {
-        console.error('Error recording date generation:', insertError);
-        throw insertError;
-      }
-
-      const { data, error } = await supabase.functions.invoke('generate-date', {
+      const { data: generatedData, error } = await supabase.functions.invoke('generate-date', {
         body: { formData: values },
       });
 
-      console.log('Response from generate-date:', { data, error });
+      console.log('Response from generate-date:', { generatedData, error });
 
       if (error) {
         console.error('Supabase function error:', error);
         throw error;
       }
 
-      if (!data?.dateIdea) {
+      if (!generatedData?.dateIdea) {
         throw new Error('No date idea was generated');
       }
 
-      setDateIdea(data.dateIdea);
+      const { error: insertError } = await supabase
+        .from('date_generations')
+        .insert([{ 
+          ip_address: await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip),
+          content: generatedData.dateIdea
+        }]);
+
+      if (insertError) {
+        console.error('Error recording date generation:', insertError);
+        throw insertError;
+      }
+
+      setDateIdea(generatedData.dateIdea);
       toast({
         title: "Success!",
         description: "Your perfect date idea has been generated.",

@@ -53,17 +53,23 @@ export type Database = {
       }
       date_generations: {
         Row: {
+          content: string | null
           created_at: string
+          description: string | null
           id: string
           ip_address: string
         }
         Insert: {
+          content?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           ip_address: string
         }
         Update: {
+          content?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           ip_address?: string
         }
