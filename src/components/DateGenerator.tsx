@@ -24,7 +24,7 @@ export function DateGenerator() {
   const { dateIdea, isLoading, generateDate } = useDateGenerator();
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 space-y-8 font-jakarta text-black">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8 font-jakarta text-black">
       <div className="text-center space-y-2">
         <h1 className="text-2xl sm:text-3xl font-bold">Date Night Generator</h1>
         <p className="text-muted-foreground text-sm sm:text-base">
