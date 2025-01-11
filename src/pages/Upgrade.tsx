@@ -1,3 +1,5 @@
+import { SubscriptionPlans } from "@/components/SubscriptionPlans";
+
 const Upgrade = () => {
   return (
     <div className="min-h-screen flex flex-col">

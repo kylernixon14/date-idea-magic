@@ -31,15 +31,15 @@ export function useDateGenerator() {
       let subscriptionType = 'free';
 
       if (session?.user) {
-        const { data: userSubscription } = await supabase
+        const { data: subscription } = await supabase
           .from('user_subscriptions')
           .select('*')
           .eq('user_id', session.user.id)
           .maybeSingle();
 
-        if (userSubscription) {
-          subscriptionType = userSubscription.subscription_type;
-          if (subscriptionType === 'free' && userSubscription.date_generations_count >= 5) {
+        if (subscription) {
+          subscriptionType = subscription.subscription_type;
+          if (subscriptionType === 'free' && subscription.date_generations_count >= 5) {
             canGenerate = false;
           }
         }
@@ -71,7 +71,7 @@ export function useDateGenerator() {
         const { error: updateError } = await supabase
           .from('user_subscriptions')
           .update({ 
-            date_generations_count: (userSubscription?.date_generations_count || 0) + 1,
+            date_generations_count: (subscription?.date_generations_count || 0) + 1,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', session.user.id);
