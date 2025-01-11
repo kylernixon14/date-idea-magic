@@ -2,7 +2,7 @@ import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/for
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { 
-  Football, 
+  Trophy, 
   Palette, 
   Mountain, 
   Dumbbell, 
@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 const hobbyOptions = [
-  { id: "sports", label: "Sports", icon: Football },
+  { id: "sports", label: "Sports", icon: Trophy },
   { id: "art", label: "Art & Crafts", icon: Palette },
   { id: "hiking", label: "Hiking & Nature", icon: Mountain },
   { id: "fitness", label: "Fitness", icon: Dumbbell },
