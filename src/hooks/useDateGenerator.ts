@@ -12,6 +12,10 @@ export const formSchema = z.object({
   yourLoveLanguage: z.string(),
   partnerLoveLanguage: z.string(),
   weather: z.string(),
+  // New optional fields
+  timeOfDay: z.string().optional(),
+  location: z.string().optional(),
+  energyLevel: z.string().optional(),
 });
 
 export type DateGeneratorFormValues = z.infer<typeof formSchema>;

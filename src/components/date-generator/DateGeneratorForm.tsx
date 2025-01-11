@@ -8,6 +8,7 @@ import { TimeSelector } from "./TimeSelector";
 import { VibeSelector } from "./VibeSelector";
 import { LoveLanguageSelector } from "./LoveLanguageSelector";
 import { WeatherSelector } from "./WeatherSelector";
+import { AdvancedOptions } from "./AdvancedOptions";
 import { useState } from "react";
 import { formSchema, type DateGeneratorFormValues } from "@/hooks/useDateGenerator";
 
@@ -25,6 +26,9 @@ export function DateGeneratorForm({ onSubmit, isLoading }: DateGeneratorFormProp
       budget: 50,
       vibes: [],
       weather: "sunny",
+      timeOfDay: undefined,
+      location: undefined,
+      energyLevel: undefined,
     },
   });
 
@@ -51,6 +55,7 @@ export function DateGeneratorForm({ onSubmit, isLoading }: DateGeneratorFormProp
             label="What's your partner's love language?" 
             name="partnerLoveLanguage" 
           />
+          <AdvancedOptions form={form} />
         </div>
 
         <Button 
