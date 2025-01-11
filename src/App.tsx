@@ -1,54 +1,31 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Upgrade from "./pages/Upgrade";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "next-themes";
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Upgrade from "@/pages/Upgrade";
+import BookmarkedDates from "@/pages/BookmarkedDates";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-const App = () => {
-  console.log("App component rendering");
-  
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/upgrade"
-              element={
-                <ProtectedRoute>
-                  <Upgrade />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
+            <Route path="/bookmarked-dates" element={<ProtectedRoute><BookmarkedDates /></ProtectedRoute>} />
           </Routes>
+          <Toaster />
         </BrowserRouter>
-      </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;

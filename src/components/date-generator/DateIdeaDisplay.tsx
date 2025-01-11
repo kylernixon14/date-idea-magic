@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download } from "lucide-react";
+import { Download, Bookmark } from "lucide-react";
 import html2pdf from 'html2pdf.js';
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface DateIdeaDisplayProps {
   dateIdea: string | null;
@@ -9,6 +12,9 @@ interface DateIdeaDisplayProps {
 }
 
 export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
+  const [isBookmarking, setIsBookmarking] = useState(false);
+  const { toast } = useToast();
+
   const handleDownloadPDF = () => {
     const content = document.getElementById('date-idea-content');
     if (!content) return;
@@ -44,22 +50,53 @@ export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
     html2pdf().set(opt).from(pdfContent).save();
   };
 
+  const handleBookmark = async () => {
+    try {
+      setIsBookmarking(true);
+      const { error } = await supabase
+        .from('bookmarked_dates')
+        .insert([{ date_idea: dateIdea }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Date bookmarked!",
+        description: "You can find it in your bookmarked dates.",
+      });
+    } catch (error) {
+      console.error('Error bookmarking date:', error);
+      toast({
+        title: "Error bookmarking date",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBookmarking(false);
+    }
+  };
+
   return (
     <Card className="mt-8">
       <CardContent className="pt-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <h2 className="text-xl font-semibold">Your Perfect Date Idea</h2>
-          {dateIdea && (
+        {dateIdea && (
+          <div className="flex justify-end gap-2 mb-4">
+            <Button
+              onClick={handleBookmark}
+              variant="ghost"
+              disabled={isBookmarking}
+              className="hover:bg-transparent"
+            >
+              <Bookmark className="h-4 w-4" />
+            </Button>
             <Button
               onClick={handleDownloadPDF}
-              variant="outline"
-              className="w-full sm:w-auto bg-custom-orange text-white hover:bg-custom-orange/90"
+              variant="ghost"
+              className="hover:bg-transparent"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Download your date
+              <Download className="h-4 w-4" />
             </Button>
-          )}
-        </div>
+          </div>
+        )}
         {isLoading ? (
           <p className="text-muted-foreground">Generating your perfect date idea...</p>
         ) : (
