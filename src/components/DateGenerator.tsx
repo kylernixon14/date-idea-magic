@@ -32,7 +32,7 @@ export function DateGenerator() {
           .from('user_subscriptions')
           .select('*')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (subscription?.subscription_type === 'free' && subscription?.date_generations_count >= 5) {
           setShowSubscription(true);
