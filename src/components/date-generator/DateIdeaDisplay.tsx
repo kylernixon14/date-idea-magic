@@ -47,13 +47,13 @@ export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
   return (
     <Card className="mt-8">
       <CardContent className="pt-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <h2 className="text-xl font-semibold">Your Perfect Date Idea</h2>
           {dateIdea && (
             <Button
               onClick={handleDownloadPDF}
               variant="outline"
-              className="bg-custom-orange text-white hover:bg-custom-orange/90"
+              className="w-full sm:w-auto bg-custom-orange text-white hover:bg-custom-orange/90"
             >
               <Download className="mr-2 h-4 w-4" />
               Download your date

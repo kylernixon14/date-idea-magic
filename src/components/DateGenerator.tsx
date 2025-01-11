@@ -114,10 +114,10 @@ export function DateGenerator() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-8 font-jakarta text-black">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 space-y-8 font-jakarta text-black">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Date Night Generator</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold">Date Night Generator</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           Answer a few questions to get your perfect date idea
         </p>
       </div>
