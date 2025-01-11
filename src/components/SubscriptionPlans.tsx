@@ -74,7 +74,7 @@ export function SubscriptionPlans() {
         <CardFooter>
           <Button 
             className="w-full" 
-            onClick={() => handleSubscribe('price_1Qg51FADvTv7NPPxP4PidneA', 'subscription')}
+            onClick={() => handleSubscribe('price_1Qg5HNADvTv7NPPxBh2vFaQJ', 'subscription')}
           >
             Subscribe Monthly
           </Button>
