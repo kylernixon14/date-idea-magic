@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
@@ -24,7 +23,7 @@ const Login = () => {
       }
 
       // Handle signup errors
-      if (event === "SIGNUP_ERROR") {
+      if (event === "SIGNED_UP" && !session) {
         console.log("Signup error occurred");
         toast({
           title: "Account Already Exists",

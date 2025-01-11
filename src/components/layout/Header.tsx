@@ -17,11 +17,11 @@ export const Header = () => {
           .from('user_subscriptions')
           .select('*')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
-        if (subscription?.subscription_type === 'free') {
+        if (!subscription || subscription?.subscription_type === 'free') {
           setShowUpgrade(true);
-          setGenerationCount(subscription.date_generations_count || 0);
+          setGenerationCount(subscription?.date_generations_count || 0);
         }
       }
     };
