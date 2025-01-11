@@ -1,5 +1,6 @@
 import { DateGenerator } from "@/components/DateGenerator";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 const Index = () => {
   return (
@@ -8,6 +9,7 @@ const Index = () => {
       <main className="flex-1">
         <DateGenerator />
       </main>
+      <Footer />
     </div>
   );
 };
