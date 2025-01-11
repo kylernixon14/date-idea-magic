@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
+import { toast } from "@/hooks/use-toast";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -9,22 +10,52 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-      if (!session) {
+    console.log("Initializing protected route");
+    
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log("Session check result:", session ? "Session exists" : "No session");
+        
+        if (error) {
+          console.error("Session check error:", error);
+          toast({
+            title: "Authentication Error",
+            description: "Please sign in again.",
+            variant: "destructive",
+          });
+        }
+
+        setSession(session);
+        setLoading(false);
+        
+        if (!session) {
+          console.log("No session found, redirecting to login");
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+        setLoading(false);
         navigate("/login");
       }
-    });
+    };
+
+    checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed in protected route:", event);
       setSession(session);
+      
       if (!session) {
+        console.log("Session ended, redirecting to login");
         navigate("/login");
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("Cleaning up protected route listeners");
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   if (loading) {
