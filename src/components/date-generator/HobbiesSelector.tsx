@@ -1,16 +1,26 @@
 import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Ball, Palette, Mountain, Dumbbell, Music, Utensils, PuzzlePiece, Book, Camera } from "lucide-react";
+import { 
+  Football, 
+  Palette, 
+  Mountain, 
+  Dumbbell, 
+  Music, 
+  Utensils, 
+  GamepadIcon, 
+  Book, 
+  Camera 
+} from "lucide-react";
 
 const hobbyOptions = [
-  { id: "sports", label: "Sports", icon: Ball },
+  { id: "sports", label: "Sports", icon: Football },
   { id: "art", label: "Art & Crafts", icon: Palette },
   { id: "hiking", label: "Hiking & Nature", icon: Mountain },
   { id: "fitness", label: "Fitness", icon: Dumbbell },
   { id: "music", label: "Music", icon: Music },
   { id: "cooking", label: "Cooking", icon: Utensils },
-  { id: "games", label: "Games & Puzzles", icon: PuzzlePiece },
+  { id: "games", label: "Games & Puzzles", icon: GamepadIcon },
   { id: "reading", label: "Reading", icon: Book },
   { id: "photography", label: "Photography", icon: Camera },
 ] as const;
