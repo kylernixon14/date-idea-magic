@@ -26,7 +26,7 @@ export function DateGenerator() {
         .from("user_subscriptions")
         .select("*")
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
       
       return subscription;
     }
@@ -62,7 +62,7 @@ export function DateGenerator() {
       toast({
         title: "Running Low!",
         description: "Only 2 generations remaining on your free plan",
-        variant: "warning",
+        variant: "default",
       });
     }
   };
