@@ -30,28 +30,34 @@ export function DateGeneratorForm({ onSubmit, isLoading }: DateGeneratorFormProp
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <RelationshipStatus form={form} />
-        <BudgetSlider 
-          form={form} 
-          sliderValue={sliderValue} 
-          setSliderValue={setSliderValue} 
-        />
-        <TimeSelector form={form} />
-        <VibeSelector form={form} />
-        <WeatherSelector form={form} />
-        <LoveLanguageSelector 
-          form={form} 
-          label="What's your love language?" 
-          name="yourLoveLanguage" 
-        />
-        <LoveLanguageSelector 
-          form={form} 
-          label="What's your partner's love language?" 
-          name="partnerLoveLanguage" 
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
+          <RelationshipStatus form={form} />
+          <BudgetSlider 
+            form={form} 
+            sliderValue={sliderValue} 
+            setSliderValue={setSliderValue} 
+          />
+          <TimeSelector form={form} />
+          <VibeSelector form={form} />
+          <WeatherSelector form={form} />
+          <LoveLanguageSelector 
+            form={form} 
+            label="What's your love language?" 
+            name="yourLoveLanguage" 
+          />
+          <LoveLanguageSelector 
+            form={form} 
+            label="What's your partner's love language?" 
+            name="partnerLoveLanguage" 
+          />
+        </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button 
+          type="submit" 
+          className="w-full h-12 text-base mt-8" 
+          disabled={isLoading}
+        >
           {isLoading ? "Generating..." : "Generate Date Idea"}
         </Button>
       </form>

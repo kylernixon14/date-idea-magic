@@ -68,11 +68,11 @@ export function DateGenerator() {
   };
 
   return (
-    <div className="container max-w-6xl py-8 space-y-8">
-      <div className="max-w-xl mx-auto space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-center">Generate Your Perfect Date</h1>
-          <p className="text-muted-foreground text-center">
+    <div className="container max-w-6xl py-4 md:py-8 px-4 md:px-8 space-y-6 md:space-y-8">
+      <div className="max-w-xl mx-auto space-y-6 md:space-y-8">
+        <div className="space-y-3 md:space-y-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-center">Generate Your Perfect Date</h1>
+          <p className="text-sm md:text-base text-muted-foreground text-center px-4">
             Tell us about your relationship and we'll create a personalized date idea just for you.
           </p>
           {isFreeUser && (

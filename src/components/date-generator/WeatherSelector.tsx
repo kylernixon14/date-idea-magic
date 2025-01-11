@@ -20,7 +20,7 @@ export function WeatherSelector({ form }: { form: any }) {
       render={({ field }) => (
         <FormItem>
           <FormLabel className="font-semibold">What's the weather like?</FormLabel>
-          <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
             {weatherOptions.map((weather) => {
               const Icon = weather.icon;
               const isSelected = field.value === weather.id;
@@ -30,7 +30,7 @@ export function WeatherSelector({ form }: { form: any }) {
                   type="button"
                   variant={isSelected ? "default" : "outline"}
                   className={cn(
-                    "w-full justify-start gap-2 border-2",
+                    "w-full h-12 md:h-14 justify-start gap-2 border-2",
                     isSelected && {
                       'bg-[var(--weather-bg)]': true,
                       'border-[var(--weather-bg)]': true,
@@ -41,8 +41,8 @@ export function WeatherSelector({ form }: { form: any }) {
                   style={isSelected ? { '--weather-bg': weather.color } as React.CSSProperties : {}}
                   onClick={() => field.onChange(weather.id)}
                 >
-                  <Icon className="h-4 w-4" />
-                  {weather.label}
+                  <Icon className="h-5 w-5" />
+                  <span className="text-sm md:text-base">{weather.label}</span>
                 </Button>
               );
             })}

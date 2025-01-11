@@ -90,24 +90,24 @@ export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
   };
 
   return (
-    <Card className="mt-8">
+    <Card className="mt-6 md:mt-8">
       <CardContent className="pt-6">
         {dateIdea && (
-          <div className="flex justify-end gap-2 mb-4">
+          <div className="flex justify-end gap-3 mb-4">
             <Button
               onClick={handleBookmark}
               variant="ghost"
               disabled={isBookmarking}
-              className="hover:bg-transparent"
+              className="hover:bg-transparent h-12 w-12"
             >
-              <Bookmark className="h-4 w-4" />
+              <Bookmark className="h-5 w-5" />
             </Button>
             <Button
               onClick={handleDownloadPDF}
               variant="ghost"
-              className="hover:bg-transparent"
+              className="hover:bg-transparent h-12 w-12"
             >
-              <Download className="h-4 w-4" />
+              <Download className="h-5 w-5" />
             </Button>
           </div>
         )}
@@ -116,7 +116,7 @@ export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
         ) : (
           <div 
             id="date-idea-content"
-            className="prose max-w-none"
+            className="prose max-w-none text-base md:text-lg"
             dangerouslySetInnerHTML={{ __html: dateIdea || '' }}
           />
         )}

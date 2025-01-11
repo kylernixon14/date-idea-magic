@@ -27,13 +27,17 @@ export function LoveLanguageSelector({
           <FormLabel className="font-semibold">{label}</FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
-              <SelectTrigger>
+              <SelectTrigger className="h-12 md:h-14 text-base">
                 <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
               {loveLanguages.map((language) => (
-                <SelectItem key={language.value} value={language.value}>
+                <SelectItem 
+                  key={language.value} 
+                  value={language.value}
+                  className="h-12 md:h-14 text-base"
+                >
                   {language.label}
                 </SelectItem>
               ))}
