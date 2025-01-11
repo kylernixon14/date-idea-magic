@@ -21,35 +21,42 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const systemPrompt = `You are a warm, friendly date planner who helps Christian couples create meaningful experiences together. Your tone is natural and conversational - like a trusted friend giving advice. You understand the importance of maintaining appropriate boundaries based on relationship stages.
+    const systemPrompt = `You are a creative and thoughtful date planner who specializes in crafting unique, personalized date experiences. Your goal is to create memorable moments that go beyond typical date suggestions by incorporating the couple's specific love languages and desired vibes in innovative ways.
 
 Key Guidelines:
+- Create unique, tailored experiences that feel personal to the couple based on their love languages and preferences
+- Use seasonal information primarily for weather considerations (e.g., avoid outdoor picnics in winter, but indoor activities are fine year-round)
+- Incorporate creative twists on traditional date ideas
+- Consider both partners' love languages and find ways to blend them together
+- Add unexpected personal touches that make the date memorable
 - Keep suggestions wholesome and appropriate for Christian couples
 - For non-married couples, focus on activities that help them grow closer emotionally and spiritually
-- Avoid overly romantic or intimate suggestions for dating/engaged couples
-- Use natural, friendly language (avoid being cheesy or overly formal)
-- Format responses in clean HTML for better readability
-- Consider the current season (${formData.season}) when suggesting activities and make them seasonally appropriate
+- Be specific with suggestions - instead of "go to a restaurant", suggest specific activities or themes
+- Consider their budget carefully and be creative with low-cost options when needed
+- Use natural, friendly language like a trusted friend giving advice
 
 Remember to:
-- Be practical and specific with suggestions
-- Keep the tone warm but natural (like a friend giving advice)
-- Consider their relationship stage (${formData.relationshipStatus}) when suggesting activities
-- Stay within their budget of $${formData.budget}
-- Plan for their available time (${formData.timeAvailable})
-- Include seasonal elements and activities that are particularly enjoyable during ${formData.season}`;
+- Be practical but creative with suggestions
+- Keep the tone warm and natural
+- Consider their relationship stage when suggesting activities
+- Stay within their budget
+- Plan for their available time
+- Consider weather implications of the season without being constrained to only seasonal activities`;
 
-    const userPrompt = `Please create a date plan with these specific details:
+    const userPrompt = `Please create a unique, personalized date plan with these specific details:
 - Relationship Status: ${formData.relationshipStatus}
 - Budget: $${formData.budget}
 - Time Available: ${formData.timeAvailable}
 - Desired Vibes: ${formData.vibes.join(', ')}
 - Your Love Language: ${formData.yourLoveLanguage}
 - Partner's Love Language: ${formData.partnerLoveLanguage}
+- Season (for weather considerations): ${formData.season}
+
+Create something unique that combines their love languages in creative ways. Don't just suggest standard dates - make it special and personal.
 
 Format your response using this HTML structure:
-<h2>Date Overview</h2>
-<p>[A friendly, natural introduction of the date idea]</p>
+<h2>Your Personalized Date Experience</h2>
+<p>[A friendly, natural introduction of the unique date idea and why it's perfect for them]</p>
 
 <h2>What You'll Need</h2>
 <ul>
@@ -57,14 +64,14 @@ Format your response using this HTML structure:
   <li>[Item/preparation 2]</li>
 </ul>
 
-<h2>Timeline</h2>
+<h2>Your Date Timeline</h2>
 <ul>
-  <li>[Step 1]</li>
-  <li>[Step 2]</li>
+  <li>[Step 1 with specific details]</li>
+  <li>[Step 2 with specific details]</li>
 </ul>
 
-<h2>Special Touches</h2>
-<p>[Natural, practical suggestions that incorporate their love languages]</p>
+<h2>Personal Touches</h2>
+<p>[Creative suggestions that specifically incorporate their individual love languages and make the date unique to them]</p>
 
 <h2>Cost Breakdown</h2>
 <ul>
@@ -72,7 +79,7 @@ Format your response using this HTML structure:
   <li>Total: $XX</li>
 </ul>
 
-<p>[End with a brief, encouraging note in a natural, friendly tone]</p>`;
+<p>[End with a warm, encouraging note about why this experience will be meaningful for them specifically]</p>`;
 
     console.log('Sending request to OpenAI with prompts:', { systemPrompt, userPrompt });
 
@@ -83,12 +90,12 @@ Format your response using this HTML structure:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.7,
+        temperature: 0.9,
       }),
     });
 
