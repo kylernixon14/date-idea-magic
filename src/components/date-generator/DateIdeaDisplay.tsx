@@ -53,9 +53,23 @@ export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
   const handleBookmark = async () => {
     try {
       setIsBookmarking(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user?.id) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to bookmark dates.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('bookmarked_dates')
-        .insert([{ date_idea: dateIdea }]);
+        .insert([{ 
+          date_idea: dateIdea,
+          user_id: session.user.id
+        }]);
 
       if (error) throw error;
 

@@ -59,9 +59,6 @@ const Login = () => {
                   background: '#e45e41',
                   borderRadius: '4px',
                   fontFamily: 'IBM Plex Mono, monospace',
-                  ':hover': {
-                    background: '#d04e33',
-                  }
                 },
                 input: {
                   borderRadius: '4px',
