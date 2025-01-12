@@ -19,19 +19,33 @@ export const ProfileMenu = () => {
   const handleLogout = async () => {
     try {
       console.log("Attempting to sign out...");
+      
+      // Clear any existing session first
+      const { error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error("Error getting session:", sessionError);
+        throw sessionError;
+      }
+
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        console.error("Error in signOut:", error);
+        throw error;
+      }
       
       console.log("Successfully signed out");
       toast({
         title: "Logged out successfully",
         duration: 2000,
       });
-      navigate("/login");
+      
+      // Use replace instead of navigate to prevent back navigation after logout
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Error signing out:", error);
       toast({
         title: "Error signing out",
+        description: "Please try again",
         variant: "destructive",
         duration: 2000,
       });

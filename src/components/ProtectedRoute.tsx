@@ -24,6 +24,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
             description: "Please sign in again.",
             variant: "destructive",
           });
+          setSession(null);
+          setLoading(false);
+          navigate("/login", { replace: true });
+          return;
         }
 
         setSession(session);
@@ -31,12 +35,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         
         if (!session) {
           console.log("No session found, redirecting to login");
-          navigate("/login");
+          navigate("/login", { replace: true });
         }
       } catch (error) {
         console.error("Session check failed:", error);
         setLoading(false);
-        navigate("/login");
+        setSession(null);
+        navigate("/login", { replace: true });
       }
     };
 
@@ -44,12 +49,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed in protected route:", event);
-      setSession(session);
       
-      if (!session) {
+      if (event === 'SIGNED_OUT') {
         console.log("Session ended, redirecting to login");
-        navigate("/login");
+        setSession(null);
+        navigate("/login", { replace: true });
+        return;
       }
+      
+      setSession(session);
     });
 
     return () => {
