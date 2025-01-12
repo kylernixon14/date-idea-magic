@@ -7,7 +7,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -25,13 +24,15 @@ serve(async (req) => {
 
 Key Guidelines:
 
-Design unique, tailored experiences that reflect the couple's personalities and love languages.
+Design unique, tailored experiences that reflect the couple's personalities, love languages, and shared interests.
 Keep suggestions wholesome and appropriate for Christian couples, focusing on emotional, spiritual, and relational growth.
 For non-married couples, prioritize activities that build emotional connection and spiritual intimacy.
 Be thoughtful about blending both partners' love languages in natural, meaningful ways.
 Add personal touches that feel intentional and heartfelt, making each date stand out.
 Stay mindful of their budget, offering affordable options that still feel special and thoughtful.
-Consider the current weather conditions and suggest appropriate indoor/outdoor activities.
+Consider their preferred time of day and energy level preferences when suggesting activities.
+If they've shared hobbies or interests, try to incorporate these naturally into the date plan.
+Consider the current weather conditions and suggest appropriate activities.
 Avoid cheesy, over-the-top phrasing. Instead, write as though you're speaking naturally to a friend—keep it real and grounded.
 Be specific and actionable—don't just say "go out to eat" or "take a walk"; give detailed ideas that reflect thoughtfulness.
 Use phrases and descriptions that are easy to relate to and reflect real-life scenarios.
@@ -48,12 +49,15 @@ Keep everything PG, even for married couples, and rooted in wholesome, faith-bas
 Relationship Status: ${formData.relationshipStatus}
 Budget: $${formData.budget}
 Time Available: ${formData.timeAvailable}
+Preferred Time: ${formData.timeOfDay || 'Flexible'}
+Energy Level: ${formData.energyLevel !== undefined ? ['Very Low', 'Low', 'Medium', 'High', 'Very High'][formData.energyLevel] : 'Flexible'}
 Desired Vibes: ${formData.vibes.join(', ')}
 Your Love Language: ${formData.yourLoveLanguage}
 Partner's Love Language: ${formData.partnerLoveLanguage}
 Current Weather: ${formData.weather}
+${formData.hobbies?.length ? `Shared Interests: ${formData.hobbies.join(', ')}` : ''}
 
-Craft a date that feels thoughtful and unique, blending their love languages into the experience in meaningful and creative ways. Focus on realistic, specific details and avoid generic suggestions. Make sure the activities are appropriate for the current weather conditions.
+Craft a date that feels thoughtful and unique, blending their love languages into the experience in meaningful and creative ways. Focus on realistic, specific details and avoid generic suggestions. Make sure the activities are appropriate for the current weather conditions and their preferred time and energy level.
 
 Format your response using this HTML structure:
 <h2>Your Personalized Date Experience</h2>

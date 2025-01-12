@@ -1,30 +1,19 @@
 import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { HobbiesSelector } from "./HobbiesSelector";
+import { Slider } from "@/components/ui/slider";
 
 const timeOptions = [
   { value: "morning", label: "Morning" },
   { value: "afternoon", label: "Afternoon" },
   { value: "evening", label: "Evening" },
-  { value: "night", label: "Late Night" },
 ] as const;
 
-const locationOptions = [
-  { value: "indoor", label: "Indoor" },
-  { value: "outdoor", label: "Outdoor" },
-  { value: "both", label: "Both" },
-] as const;
-
-const energyLevels = [
-  { value: "low", label: "Low Energy" },
-  { value: "medium", label: "Medium Energy" },
-  { value: "high", label: "High Energy" },
-] as const;
+const energyLevels = ["Very Low", "Low", "Medium", "High", "Very High"] as const;
 
 export function AdvancedOptions({ form }: { form: any }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,87 +39,33 @@ export function AdvancedOptions({ form }: { form: any }) {
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-6 mt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="timeOfDay"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold">Preferred Time</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="h-12 md:h-14">
-                      <SelectValue placeholder="Select preferred time" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {timeOptions.map((option) => (
-                      <SelectItem 
-                        key={option.value} 
-                        value={option.value}
-                        className="h-12 md:h-14"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold">Location Preference</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="h-12 md:h-14">
-                      <SelectValue placeholder="Select location type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {locationOptions.map((option) => (
-                      <SelectItem 
-                        key={option.value} 
-                        value={option.value}
-                        className="h-12 md:h-14"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-
+        <div className="grid grid-cols-1 gap-6">
           <FormField
             control={form.control}
             name="energyLevel"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-semibold">Energy Level</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="h-12 md:h-14">
-                      <SelectValue placeholder="Select energy level" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {energyLevels.map((option) => (
-                      <SelectItem 
-                        key={option.value} 
-                        value={option.value}
-                        className="h-12 md:h-14"
-                      >
-                        {option.label}
-                      </SelectItem>
+                <div className="pt-2">
+                  <Slider
+                    min={0}
+                    max={4}
+                    step={1}
+                    value={[field.value ?? 2]}
+                    onValueChange={(value) => field.onChange(value[0])}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+                    {energyLevels.map((level, index) => (
+                      <span key={level} className={cn(
+                        "cursor-pointer",
+                        field.value === index && "font-medium text-foreground"
+                      )}>
+                        {level}
+                      </span>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </div>
               </FormItem>
             )}
           />

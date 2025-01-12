@@ -14,8 +14,7 @@ export const formSchema = z.object({
   weather: z.string(),
   // Optional fields
   timeOfDay: z.string().optional(),
-  location: z.string().optional(),
-  energyLevel: z.string().optional(),
+  energyLevel: z.number().min(0).max(4).optional(),
   hobbies: z.array(z.string()).default([]),
 });
 
