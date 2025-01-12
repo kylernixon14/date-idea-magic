@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,13 +23,49 @@ const Login = () => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event) => {
-      console.log("Auth state changed:", event);
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed in Login:", event, session?.user?.id);
       
       if (event === "SIGNED_IN") {
+        console.log("User signed in, redirecting to home");
         navigate("/");
+      } else if (event === "SIGNED_UP") {
+        console.log("New user signed up");
+        toast({
+          title: "Welcome to DateGen!",
+          description: "Your account has been created successfully.",
+        });
+        navigate("/");
+      } else if (event === "USER_UPDATED") {
+        console.log("User updated");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (session) {
+          navigate("/");
+        }
+        if (error) {
+          console.error("Session check error:", error);
+          toast({
+            title: "Error",
+            description: "There was a problem with your account. Please try again.",
+            variant: "destructive",
+          });
+        }
       }
     });
+
+    // Check for existing session on mount
+    const checkExistingSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (session) {
+        console.log("Existing session found, redirecting to home");
+        navigate("/");
+      }
+      if (error) {
+        console.error("Session check error:", error);
+      }
+    };
+
+    checkExistingSession();
 
     return () => {
       subscription.unsubscribe();
