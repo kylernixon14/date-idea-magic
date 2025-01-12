@@ -4,13 +4,14 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { RelationshipStatus } from "./RelationshipStatus";
 import { BudgetSlider } from "./BudgetSlider";
-import { TimeSelector } from "./TimeSelector";
 import { VibeSelector } from "./VibeSelector";
 import { LoveLanguageSelector } from "./LoveLanguageSelector";
 import { WeatherSelector } from "./WeatherSelector";
 import { AdvancedOptions } from "./AdvancedOptions";
 import { useState } from "react";
 import { formSchema, type DateGeneratorFormValues } from "@/hooks/useDateGenerator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 
 interface DateGeneratorFormProps {
   onSubmit: (values: DateGeneratorFormValues) => void;
@@ -27,9 +28,9 @@ export function DateGeneratorForm({ onSubmit, isLoading }: DateGeneratorFormProp
       vibes: [],
       weather: "sunny",
       timeOfDay: undefined,
-      location: undefined,
       energyLevel: undefined,
       hobbies: [],
+      timeAvailable: undefined,
     },
   });
 
@@ -43,7 +44,27 @@ export function DateGeneratorForm({ onSubmit, isLoading }: DateGeneratorFormProp
             sliderValue={sliderValue} 
             setSliderValue={setSliderValue} 
           />
-          <TimeSelector form={form} />
+          <FormField
+            control={form.control}
+            name="timeAvailable"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-semibold">How much time do you have?</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select time available" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1-2">1-2 hours</SelectItem>
+                    <SelectItem value="2-4">2-4 hours</SelectItem>
+                    <SelectItem value="4-6">4-6 hours</SelectItem>
+                    <SelectItem value="6+">6+ hours</SelectItem>
+                    <SelectItem value="full-day">Full day</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
           <VibeSelector form={form} />
           <WeatherSelector form={form} />
           <LoveLanguageSelector 
