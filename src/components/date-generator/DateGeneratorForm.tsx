@@ -26,7 +26,7 @@ export function DateGeneratorForm({ onSubmit, isLoading }: DateGeneratorFormProp
     defaultValues: {
       budget: 50,
       vibes: [],
-      weather: "sunny",
+      weather: undefined,
       timeOfDay: undefined,
       energyLevel: undefined,
       hobbies: [],
@@ -51,7 +51,7 @@ export function DateGeneratorForm({ onSubmit, isLoading }: DateGeneratorFormProp
               <FormItem>
                 <FormLabel className="font-semibold">How much time do you have?</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12 md:h-14">
                     <SelectValue placeholder="Select time available" />
                   </SelectTrigger>
                   <SelectContent>

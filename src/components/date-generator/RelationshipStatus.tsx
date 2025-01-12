@@ -24,7 +24,7 @@ export function RelationshipStatus({ form }: { form: any }) {
                   type="button"
                   variant={field.value === option.value ? "default" : "outline"}
                   className={cn(
-                    "w-full justify-center",
+                    "w-full h-12 md:h-14 justify-center text-sm md:text-base",
                     field.value === option.value && "bg-primary text-primary-foreground"
                   )}
                   onClick={() => field.onChange(option.value)}
