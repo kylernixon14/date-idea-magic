@@ -26,24 +26,25 @@ const Login = () => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event);
       
-      if (event === "SIGNED_IN") {
-        console.log("User signed in, sending welcome email");
-        if (event === "SIGNED_UP") {
-          try {
-            const { error } = await supabase.functions.invoke('send-welcome-email', {
-              body: { email: session?.user?.email }
-            });
-            
-            if (error) throw error;
-            
-            toast({
-              title: "Welcome to DateGen!",
-              description: "Check your email for a special welcome message.",
-            });
-          } catch (error) {
-            console.error("Failed to send welcome email:", error);
-          }
+      if (event === "SIGNED_UP") {
+        console.log("New user signed up, sending welcome email");
+        try {
+          const { error } = await supabase.functions.invoke('send-welcome-email', {
+            body: { email: session?.user?.email }
+          });
+          
+          if (error) throw error;
+          
+          toast({
+            title: "Welcome to DateGen!",
+            description: "Check your email for a special welcome message.",
+          });
+        } catch (error) {
+          console.error("Failed to send welcome email:", error);
         }
+      }
+
+      if (event === "SIGNED_IN" || event === "SIGNED_UP") {
         navigate("/");
       }
     });
