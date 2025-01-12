@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -23,28 +22,10 @@ const Login = () => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event) => {
       console.log("Auth state changed:", event);
       
-      if (event === "SIGNED_UP") {
-        console.log("New user signed up, sending welcome email");
-        try {
-          const { error } = await supabase.functions.invoke('send-welcome-email', {
-            body: { email: session?.user?.email }
-          });
-          
-          if (error) throw error;
-          
-          toast({
-            title: "Welcome to DateGen!",
-            description: "Check your email for a special welcome message.",
-          });
-        } catch (error) {
-          console.error("Failed to send welcome email:", error);
-        }
-      }
-
-      if (event === "SIGNED_IN" || event === "SIGNED_UP") {
+      if (event === "SIGNED_IN") {
         navigate("/");
       }
     });
