@@ -100,18 +100,21 @@ export type Database = {
         Row: {
           created_at: string
           full_name: string | null
+          has_seen_welcome: boolean | null
           id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           full_name?: string | null
+          has_seen_welcome?: boolean | null
           id: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           full_name?: string | null
+          has_seen_welcome?: boolean | null
           id?: string
           updated_at?: string
         }

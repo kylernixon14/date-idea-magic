@@ -1,0 +1,129 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+export const WelcomeScreen = () => {
+  const navigate = useNavigate();
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleStart = async () => {
+    setIsUpdating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await supabase
+          .from('profiles')
+          .update({ has_seen_welcome: true })
+          .eq('id', session.user.id);
+      }
+    } catch (error) {
+      console.error('Error updating welcome status:', error);
+    }
+    setIsUpdating(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-custom-tan flex items-center justify-center px-4">
+      <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8 space-y-6">
+        <h1 className="text-3xl font-bold text-center text-custom-orange">
+          Say buh-bye to boring dates!
+        </h1>
+        
+        <div className="space-y-4 text-gray-700">
+          <p>Hey there!</p>
+          
+          <p>
+            We're Britt & Kyler, the founders of{" "}
+            <a 
+              href="https://loveyourfirstyear.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-custom-orange hover:underline"
+            >
+              Love Your First Year
+            </a>
+            , and we wanted to welcome you to DateGen.
+          </p>
+          
+          <p>As a couple, we love finding new and unique date ideas.</p>
+          
+          <p>
+            DateGen allows you to answer a few simple questions and uses AI to generate 
+            a completely custom, completely unique date... So you can finally say "buh-bye" 
+            to boring and non-unique dates.
+          </p>
+          
+          <p>
+            To get started, you can generate 5 dates and will have access to all premium 
+            features like bookmarking and advanced options.
+          </p>
+          
+          <p>Then, if you'd like to upgrade:</p>
+          <ul className="list-disc list-inside pl-4 space-y-2">
+            <li>
+              you can pay $4.99 for an unlimited monthly membership{" "}
+              <Link to="/upgrade" className="text-custom-orange hover:underline">
+                (upgrade now)
+              </Link>
+            </li>
+            <li>
+              or $39 for an unlimited LIFETIME membership{" "}
+              <Link to="/upgrade" className="text-custom-orange hover:underline">
+                (upgrade now)
+              </Link>
+            </li>
+          </ul>
+          
+          <p>
+            If you have any questions, issues, or features you'd like to see us add, 
+            shoot us a DM on Instagram{" "}
+            <a 
+              href="https://instagram.com/loveyourfirstyear" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-custom-orange hover:underline"
+            >
+              @loveyourfirstyear
+            </a>
+            {" "}or an email at{" "}
+            <a 
+              href="mailto:hello@loveyourfirstyear.com"
+              className="text-custom-orange hover:underline"
+            >
+              hello@loveyourfirstyear.com
+            </a>
+          </p>
+          
+          <p>Happy dating!</p>
+          <p>-Britt & Kyler</p>
+          
+          <div className="flex justify-center">
+            <img 
+              src="/lovable-uploads/fefcff63-f014-454e-b2cb-5631e5d1b6cb.png" 
+              alt="Britt & Kyler" 
+              className="w-24 h-24 rounded-full object-cover"
+            />
+          </div>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+          <Button
+            onClick={handleStart}
+            disabled={isUpdating}
+            className="w-full sm:w-auto"
+          >
+            Generate your first date
+          </Button>
+          <Link 
+            to="/upgrade" 
+            className="flex items-center gap-2 text-custom-orange hover:underline"
+          >
+            or upgrade now <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
