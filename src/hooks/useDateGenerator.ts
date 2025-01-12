@@ -31,13 +31,21 @@ export const useDateGenerator = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return null;
       
-      const { data: subscription } = await supabase
+      const { data: subscription, error } = await supabase
         .from("user_subscriptions")
         .select("*")
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
       
-      return subscription;
+      if (error) {
+        console.error("Error fetching subscription:", error);
+        return null;
+      }
+      
+      return subscription || { 
+        subscription_type: 'free', 
+        date_generations_count: 0 
+      };
     }
   });
 

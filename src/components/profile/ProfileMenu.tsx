@@ -20,17 +20,13 @@ export const ProfileMenu = () => {
     try {
       console.log("Attempting to sign out...");
       
-      // Clear any existing session first
-      const { error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        console.error("Error getting session:", sessionError);
-        throw sessionError;
-      }
-
       const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error("Error in signOut:", error);
-        throw error;
+        // Only throw if it's not a "user not found" error
+        if (!error.message.includes("user_not_found")) {
+          console.error("Error in signOut:", error);
+          throw error;
+        }
       }
       
       console.log("Successfully signed out");
