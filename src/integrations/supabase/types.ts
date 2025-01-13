@@ -127,6 +127,8 @@ export type Database = {
         Row: {
           created_at: string
           date_generations_count: number | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           subscription_status: string | null
           subscription_type: string | null
           updated_at: string
@@ -135,6 +137,8 @@ export type Database = {
         Insert: {
           created_at?: string
           date_generations_count?: number | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           subscription_status?: string | null
           subscription_type?: string | null
           updated_at?: string
@@ -143,6 +147,8 @@ export type Database = {
         Update: {
           created_at?: string
           date_generations_count?: number | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           subscription_status?: string | null
           subscription_type?: string | null
           updated_at?: string
