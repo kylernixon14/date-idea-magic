@@ -1,5 +1,6 @@
-import { LogOut, User, Bookmark } from "lucide-react";
+import { LogOut, User, Bookmark, Ban } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -15,6 +16,24 @@ import { Button } from "@/components/ui/button";
 export const ProfileMenu = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: subscription } = await supabase
+          .from('user_subscriptions')
+          .select('subscription_type')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        setSubscriptionType(subscription?.subscription_type || null);
+      }
+    };
+
+    checkSubscription();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -22,7 +41,6 @@ export const ProfileMenu = () => {
       
       const { error } = await supabase.auth.signOut();
       if (error) {
-        // Only throw if it's not a "user not found" error
         if (!error.message.includes("user_not_found")) {
           console.error("Error in signOut:", error);
           throw error;
@@ -35,7 +53,6 @@ export const ProfileMenu = () => {
         duration: 2000,
       });
       
-      // Use replace instead of navigate to prevent back navigation after logout
       navigate("/login", { replace: true });
     } catch (error) {
       console.error("Error signing out:", error);
@@ -46,6 +63,14 @@ export const ProfileMenu = () => {
         duration: 2000,
       });
     }
+  };
+
+  const handleCancelSubscription = async () => {
+    toast({
+      title: "Coming Soon",
+      description: "Subscription cancellation will be available soon.",
+      duration: 3000,
+    });
   };
 
   return (
@@ -62,6 +87,12 @@ export const ProfileMenu = () => {
           <Bookmark className="mr-2 h-4 w-4" />
           <span>Bookmarked Dates</span>
         </DropdownMenuItem>
+        {subscriptionType === 'premium' && (
+          <DropdownMenuItem onClick={handleCancelSubscription}>
+            <Ban className="mr-2 h-4 w-4" />
+            <span>Cancel Subscription</span>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
