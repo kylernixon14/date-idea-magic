@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { DateGenerator } from "@/components/DateGenerator";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { WelcomeScreen } from "@/components/WelcomeScreen";
+import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
-  const [showWelcome, setShowWelcome] = useState<boolean | null>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     const checkWelcomeStatus = async () => {
@@ -23,24 +23,11 @@ const Index = () => {
         }
       } catch (error) {
         console.error('Error checking welcome status:', error);
-        setShowWelcome(false);
       }
     };
 
     checkWelcomeStatus();
   }, []);
-
-  if (showWelcome === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
-
-  if (showWelcome) {
-    return <WelcomeScreen />;
-  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -49,6 +36,10 @@ const Index = () => {
         <DateGenerator />
       </main>
       <Footer />
+      <WelcomeDialog 
+        open={showWelcome} 
+        onOpenChange={setShowWelcome}
+      />
     </div>
   );
 };

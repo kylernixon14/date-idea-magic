@@ -1,11 +1,20 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 
-export const WelcomeScreen = () => {
-  const navigate = useNavigate();
+interface WelcomeDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const WelcomeDialog = ({ open, onOpenChange }: WelcomeDialogProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleStart = async () => {
@@ -17,17 +26,26 @@ export const WelcomeScreen = () => {
           .from('profiles')
           .update({ has_seen_welcome: true })
           .eq('id', session.user.id);
-        navigate('/');
+        onOpenChange(false);
+        toast({
+          title: "Welcome to DateGen!",
+          description: "Let's create your first date idea.",
+        });
       }
     } catch (error) {
       console.error('Error updating welcome status:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem saving your preferences.",
+        variant: "destructive",
+      });
     }
     setIsUpdating(false);
   };
 
   return (
-    <div className="min-h-screen bg-custom-tan flex items-center justify-center px-4">
-      <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8 space-y-6">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl bg-white p-8 space-y-6">
         <h1 className="text-3xl font-bold text-center text-custom-orange">
           Say buh-bye to boring dates!
         </h1>
@@ -124,7 +142,7 @@ export const WelcomeScreen = () => {
             or upgrade now <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
