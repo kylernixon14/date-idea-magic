@@ -79,6 +79,7 @@ export type Database = {
           description: string | null
           id: string
           ip_address: string
+          user_id: string | null
         }
         Insert: {
           content?: string | null
@@ -86,6 +87,7 @@ export type Database = {
           description?: string | null
           id?: string
           ip_address: string
+          user_id?: string | null
         }
         Update: {
           content?: string | null
@@ -93,6 +95,7 @@ export type Database = {
           description?: string | null
           id?: string
           ip_address?: string
+          user_id?: string | null
         }
         Relationships: []
       }
