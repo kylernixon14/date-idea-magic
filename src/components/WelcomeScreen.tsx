@@ -17,6 +17,7 @@ export const WelcomeScreen = () => {
           .from('profiles')
           .update({ has_seen_welcome: true })
           .eq('id', session.user.id);
+        navigate('/');
       }
     } catch (error) {
       console.error('Error updating welcome status:', error);
@@ -99,9 +100,9 @@ export const WelcomeScreen = () => {
           <p>Happy dating!</p>
           <p>-Britt & Kyler</p>
           
-          <div className="flex justify-center">
+          <div className="flex justify-start">
             <img 
-              src="/lovable-uploads/fefcff63-f014-454e-b2cb-5631e5d1b6cb.png" 
+              src="/lovable-uploads/b7d1bdee-3221-45e6-a74e-63879cdd577c.png" 
               alt="Britt & Kyler" 
               className="w-24 h-24 rounded-full object-cover"
             />
