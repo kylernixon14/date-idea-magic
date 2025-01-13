@@ -66,11 +66,50 @@ export const ProfileMenu = () => {
   };
 
   const handleCancelSubscription = async () => {
-    toast({
-      title: "Coming Soon",
-      description: "Subscription cancellation will be available soon.",
-      duration: 3000,
-    });
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cancel-subscription`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to cancel subscription');
+      }
+
+      toast({
+        title: "Subscription Cancellation Scheduled",
+        description: "Your subscription will be canceled at the end of the billing period",
+        duration: 5000,
+      });
+
+      // Refresh subscription status
+      const { data: subscription } = await supabase
+        .from('user_subscriptions')
+        .select('subscription_type')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+      
+      setSubscriptionType(subscription?.subscription_type || null);
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to cancel subscription",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
   };
 
   return (
