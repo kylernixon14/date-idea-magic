@@ -1,39 +1,40 @@
-import { Link } from "react-router-dom";
+import { ArrowUpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface UpgradeBannerProps {
   remainingDates: number;
 }
 
 export function UpgradeBanner({ remainingDates }: UpgradeBannerProps) {
-  if (remainingDates <= 0) {
-    return (
-      <div className="flex flex-col items-center space-y-3 p-4 rounded-lg border bg-background/95 shadow-sm">
-        <p className="text-sm text-muted-foreground text-center">
-          No generations left :(
-        </p>
-        <Button asChild variant="outline" size="sm">
-          <Link to="/upgrade" className="flex items-center gap-2">
-            Upgrade now
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
-    );
-  }
+  const navigate = useNavigate();
+
+  if (remainingDates > 2) return null;
 
   return (
-    <div className="flex flex-col items-center space-y-3 p-4 rounded-lg border bg-background/95 shadow-sm">
-      <p className="text-sm text-muted-foreground text-center">
-        Only {remainingDates} {remainingDates === 1 ? 'generation' : 'generations'} left
-      </p>
-      <Button asChild variant="outline" size="sm">
-        <Link to="/upgrade" className="flex items-center gap-2">
-          Upgrade now
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </Button>
+    <div className="w-full p-4 bg-orange-50 border border-[#e45e41] rounded-lg mt-4">
+      <div className="flex items-center gap-3">
+        <ArrowUpCircle className="h-5 w-5 text-[#e45e41]" />
+        <div className="flex-1">
+          <p className="text-sm font-medium">
+            {remainingDates <= 0 
+              ? "No generations left :("
+              : remainingDates === 1 
+                ? "Last generation remaining!"
+                : "Only 2 generations left"
+            }
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Join hundreds of couples who've upgraded for unlimited date ideas
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate("/upgrade")}
+          className="bg-[#e45e41] hover:bg-[#e45e41]/90"
+        >
+          Upgrade Now
+        </Button>
+      </div>
     </div>
   );
 }
