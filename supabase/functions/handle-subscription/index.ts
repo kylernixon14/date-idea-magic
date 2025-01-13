@@ -13,7 +13,9 @@ const supabaseClient = createClient(
 
 serve(async (req) => {
   const signature = req.headers.get('stripe-signature')
+  
   if (!signature) {
+    console.error('No stripe signature found in webhook request')
     return new Response('No signature', { status: 400 })
   }
 
@@ -22,9 +24,12 @@ serve(async (req) => {
     const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
     
     if (!endpointSecret) {
+      console.error('Missing Stripe webhook secret')
       throw new Error('Missing Stripe webhook secret')
     }
 
+    console.log('Constructing Stripe event with signature:', signature.substring(0, 20) + '...')
+    
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
@@ -39,12 +44,14 @@ serve(async (req) => {
         const userId = session.metadata?.user_id
 
         if (!userId) {
+          console.error('No user ID in metadata')
           throw new Error('No user ID in metadata')
         }
 
+        console.log('Updating subscription for user:', userId)
         const subscriptionType = session.mode === 'subscription' ? 'premium' : 'lifetime'
         
-        await supabaseClient
+        const { error: updateError } = await supabaseClient
           .from('user_subscriptions')
           .update({ 
             subscription_type: subscriptionType,
@@ -55,6 +62,12 @@ serve(async (req) => {
           })
           .eq('user_id', userId)
 
+        if (updateError) {
+          console.error('Error updating subscription:', updateError)
+          throw updateError
+        }
+
+        console.log('Successfully updated subscription for user:', userId)
         break
       }
 
@@ -63,20 +76,24 @@ serve(async (req) => {
         const customer = await stripe.customers.retrieve(subscription.customer as string)
         
         if (!customer || typeof customer === 'string' || !customer.email) {
+          console.error('Invalid customer data')
           throw new Error('Invalid customer data')
         }
 
-        const { data: users } = await supabaseClient
+        console.log('Finding user for customer email:', customer.email)
+        const { data: users, error: userError } = await supabaseClient
           .from('profiles')
           .select('id')
           .eq('email', customer.email)
           .limit(1)
 
-        if (!users?.length) {
+        if (userError || !users?.length) {
+          console.error('Error finding user:', userError)
           throw new Error('User not found')
         }
 
-        await supabaseClient
+        console.log('Updating subscription status for user:', users[0].id)
+        const { error: updateError } = await supabaseClient
           .from('user_subscriptions')
           .update({ 
             subscription_type: 'free',
@@ -85,6 +102,12 @@ serve(async (req) => {
           })
           .eq('user_id', users[0].id)
 
+        if (updateError) {
+          console.error('Error updating subscription:', updateError)
+          throw updateError
+        }
+
+        console.log('Successfully updated subscription status for user:', users[0].id)
         break
       }
     }
@@ -94,7 +117,7 @@ serve(async (req) => {
       status: 200,
     })
   } catch (err) {
-    console.error('Error:', err)
+    console.error('Error processing webhook:', err)
     return new Response(
       JSON.stringify({ error: err.message }),
       { status: 400 }
