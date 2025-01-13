@@ -35,6 +35,7 @@ export function DateGenerator() {
   const generationsUsed = subscriptionData?.date_generations_count || 0;
   const remainingDates = MAX_FREE_GENERATIONS - generationsUsed;
   const isFreeUser = subscriptionData?.subscription_type === "free";
+  const isLifetimeUser = subscriptionData?.subscription_type === "lifetime";
 
   const handleSubmit = async (values: any) => {
     if (isFreeUser && generationsUsed >= MAX_FREE_GENERATIONS) {

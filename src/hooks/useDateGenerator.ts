@@ -79,8 +79,8 @@ export const useDateGenerator = () => {
       console.log('Response from generate-date function:', data);
       setDateIdea(data.dateIdea);
       
-      // Update the generation count in the database
-      if (session?.user) {
+      // Only update generation count for free users
+      if (session?.user && subscriptionData?.subscription_type === "free") {
         const { error: updateError } = await supabase
           .from("user_subscriptions")
           .update({ 
