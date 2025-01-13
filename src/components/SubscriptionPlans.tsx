@@ -98,7 +98,7 @@ export function SubscriptionPlans() {
         <CardFooter>
           <Button 
             className="w-full py-6 bg-custom-orange hover:bg-custom-orange/90"
-            onClick={() => handleSubscribe('price_1OqXxeADvTv7NPPxPxJYWxhm')}
+            onClick={() => handleSubscribe('price_1QgvyLADvTv7NPPxxG9VCuDk')}
           >
             Get Lifetime Access
           </Button>
