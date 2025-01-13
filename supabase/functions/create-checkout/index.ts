@@ -32,6 +32,8 @@ serve(async (req) => {
       throw new Error('User email not found')
     }
 
+    console.log('Creating checkout session for user:', user.id)
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
