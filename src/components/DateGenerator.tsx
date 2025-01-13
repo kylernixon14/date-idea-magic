@@ -35,6 +35,7 @@ export function DateGenerator() {
   const generationsUsed = subscriptionData?.date_generations_count || 0;
   const remainingDates = MAX_FREE_GENERATIONS - generationsUsed;
   const isFreeUser = subscriptionData?.subscription_type === "free";
+  const isPremiumUser = subscriptionData?.subscription_type === "premium";
   const isLifetimeUser = subscriptionData?.subscription_type === "lifetime";
 
   const handleSubmit = async (values: any) => {
@@ -85,7 +86,7 @@ export function DateGenerator() {
 
         <DateGeneratorForm onSubmit={handleSubmit} isLoading={isLoading} />
         
-        {isFreeUser && <UpgradeBanner remainingDates={remainingDates} />}
+        {(isFreeUser || isPremiumUser) && <UpgradeBanner remainingDates={remainingDates} />}
       </div>
 
       {dateIdea && <DateIdeaDisplay dateIdea={dateIdea} isLoading={isLoading} />}
