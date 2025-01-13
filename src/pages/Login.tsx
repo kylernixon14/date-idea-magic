@@ -29,7 +29,7 @@ const Login = () => {
       if (event === "SIGNED_IN") {
         console.log("User signed in, redirecting to home");
         navigate("/");
-      } else if (event === "SIGNED_UP") {
+      } else if (event === "USER_CREATED") {
         console.log("New user signed up");
         toast({
           title: "Welcome to DateGen!",

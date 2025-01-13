@@ -19,11 +19,18 @@ export function SubscriptionPlans() {
         return;
       }
 
+      console.log('Creating checkout session with priceId:', priceId);
+      
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { priceId, mode: 'payment' }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error from create-checkout function:', error);
+        throw error;
+      }
+      
+      console.log('Checkout session created:', data);
       if (!data?.url) throw new Error('No checkout URL returned');
 
       window.location.href = data.url;
@@ -91,7 +98,7 @@ export function SubscriptionPlans() {
         <CardFooter>
           <Button 
             className="w-full py-6 bg-custom-orange hover:bg-custom-orange/90"
-            onClick={() => handleSubscribe('price_1Qg51FADvTv7NPPxP4PidneA')}
+            onClick={() => handleSubscribe('price_1OqXxeADvTv7NPPxPxJYWxhm')}
           >
             Get Lifetime Access
           </Button>
