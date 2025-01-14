@@ -14,90 +14,87 @@ serve(async (req) => {
 
   try {
     const { priceId, mode } = await req.json()
-    
-    if (!priceId || !mode) {
-      throw new Error('Price ID and mode are required')
-    }
+    console.log('Received request for priceId:', priceId, 'mode:', mode)
 
+    // Get the user's session
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
     const authHeader = req.headers.get('Authorization')!
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user } } = await supabaseClient.auth.getUser(token)
+    console.log('Auth header present:', !!authHeader)
+    
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    )
 
-    if (!user?.email) {
-      throw new Error('User email not found')
+    if (userError || !user) {
+      console.error('Error getting user:', userError)
+      throw new Error('Unauthorized')
     }
 
-    console.log('Creating checkout session for user:', user.id)
+    console.log('Creating checkout for user:', user.id)
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    // Check if customer exists
-    const customers = await stripe.customers.list({
+    // Check if customer already exists
+    const { data: customers } = await stripe.customers.list({
       email: user.email,
-      limit: 1
+      limit: 1,
     })
 
-    let customerId = undefined
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id
-      
-      // For subscriptions, check if already subscribed
-      if (mode === 'subscription') {
-        const subscriptions = await stripe.subscriptions.list({
-          customer: customerId,
-          status: 'active',
-          price: priceId,
-          limit: 1
-        })
+    let customerId = customers.data[0]?.id
 
-        if (subscriptions.data.length > 0) {
-          throw new Error("Already subscribed to this plan")
+    // Create new customer if doesn't exist
+    if (!customerId) {
+      console.log('Creating new customer for:', user.email)
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: {
+          user_id: user.id
         }
-      }
+      })
+      customerId = customer.id
     }
 
-    console.log('Creating checkout session...')
+    console.log('Creating checkout session for customer:', customerId)
+    
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
-      mode: mode as 'subscription' | 'payment',
+      mode: mode,
       success_url: `${req.headers.get('origin')}/`,
-      cancel_url: `${req.headers.get('origin')}/`,
+      cancel_url: `${req.headers.get('origin')}/upgrade`,
       metadata: {
-        user_id: user.id,
+        user_id: user.id
       }
     })
 
     console.log('Checkout session created:', session)
-    if (!session?.url) throw new Error('No checkout URL returned');
+    if (!session?.url) throw new Error('No checkout URL returned')
 
     return new Response(
       JSON.stringify({ url: session.url }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in create-checkout:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+        status: 400,
       }
     )
   }
