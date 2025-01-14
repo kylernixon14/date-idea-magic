@@ -123,34 +123,28 @@ export type Database = {
         }
         Relationships: []
       }
-      user_subscriptions: {
+      user_access: {
         Row: {
+          access_type: string
           created_at: string
           date_generations_count: number | null
           stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          subscription_status: string | null
-          subscription_type: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          access_type?: string
           created_at?: string
           date_generations_count?: number | null
           stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          subscription_status?: string | null
-          subscription_type?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          access_type?: string
           created_at?: string
           date_generations_count?: number | null
           stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          subscription_status?: string | null
-          subscription_type?: string | null
           updated_at?: string
           user_id?: string
         }

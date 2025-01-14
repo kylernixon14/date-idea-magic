@@ -12,7 +12,6 @@ export const formSchema = z.object({
   yourLoveLanguage: z.string(),
   partnerLoveLanguage: z.string(),
   weather: z.string(),
-  // Optional fields
   timeOfDay: z.string().optional(),
   energyLevel: z.number().min(0).max(4).optional(),
   hobbies: z.array(z.string()).default([]),
@@ -25,25 +24,25 @@ export const useDateGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
-  const { data: subscriptionData } = useQuery({
-    queryKey: ["subscription"],
+  const { data: accessData } = useQuery({
+    queryKey: ["userAccess"],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return null;
       
-      const { data: subscription, error } = await supabase
-        .from("user_subscriptions")
+      const { data: access, error } = await supabase
+        .from("user_access")
         .select("*")
         .eq("user_id", session.user.id)
         .maybeSingle();
       
       if (error) {
-        console.error("Error fetching subscription:", error);
+        console.error("Error fetching access:", error);
         return null;
       }
       
-      return subscription || { 
-        subscription_type: 'free', 
+      return access || { 
+        access_type: 'free', 
         date_generations_count: 0 
       };
     }
@@ -54,8 +53,8 @@ export const useDateGenerator = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (session?.user && subscriptionData?.subscription_type === "free") {
-        if ((subscriptionData?.date_generations_count || 0) >= 5) {
+      if (session?.user && accessData?.access_type === "free") {
+        if ((accessData?.date_generations_count || 0) >= 5) {
           toast({
             title: "Free limit reached",
             description: "Please upgrade to generate more dates",
@@ -80,11 +79,11 @@ export const useDateGenerator = () => {
       setDateIdea(data.dateIdea);
       
       // Only update generation count for free users
-      if (session?.user && subscriptionData?.subscription_type === "free") {
+      if (session?.user && accessData?.access_type === "free") {
         const { error: updateError } = await supabase
-          .from("user_subscriptions")
+          .from("user_access")
           .update({ 
-            date_generations_count: (subscriptionData?.date_generations_count || 0) + 1 
+            date_generations_count: (accessData?.date_generations_count || 0) + 1 
           })
           .eq("user_id", session.user.id);
           

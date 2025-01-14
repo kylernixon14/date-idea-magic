@@ -8,35 +8,32 @@ import { supabase } from "@/integrations/supabase/client";
 export const Header = () => {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [generationCount, setGenerationCount] = useState<number | null>(null);
-  const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
+  const [accessType, setAccessType] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkSubscription = async () => {
+    const checkAccess = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        const { data: subscription } = await supabase
-          .from('user_subscriptions')
+        const { data: access } = await supabase
+          .from('user_access')
           .select('*')
           .eq('user_id', session.user.id)
           .maybeSingle();
 
-        if (subscription) {
-          setSubscriptionType(subscription.subscription_type);
-          if (subscription.subscription_type === 'free') {
+        if (access) {
+          setAccessType(access.access_type);
+          if (access.access_type === 'free') {
             setShowUpgrade(true);
-            setGenerationCount(subscription.date_generations_count || 0);
-          } else if (subscription.subscription_type === 'premium') {
-            setShowUpgrade(true); // Show upgrade for premium users (monthly plan)
-            setGenerationCount(null); // Don't show generation count for premium users
-          } else {
-            setShowUpgrade(false); // Hide upgrade for lifetime users
+            setGenerationCount(access.date_generations_count || 0);
+          } else if (access.access_type === 'lifetime') {
+            setShowUpgrade(false);
             setGenerationCount(null);
           }
         }
       }
     };
 
-    checkSubscription();
+    checkAccess();
   }, []);
 
   return (
@@ -53,7 +50,7 @@ export const Header = () => {
           <div className="flex items-center gap-4">
             {showUpgrade && (
               <>
-                {subscriptionType === 'free' && generationCount !== null && (
+                {accessType === 'free' && generationCount !== null && (
                   <div className="hidden sm:flex items-center gap-1 text-sm text-muted-foreground">
                     <Percent className="h-4 w-4" />
                     <span>{5 - generationCount} dates left</span>
@@ -65,9 +62,7 @@ export const Header = () => {
                   asChild 
                   className="hidden sm:inline-flex"
                 >
-                  <Link to="/upgrade">
-                    {subscriptionType === 'premium' ? 'Upgrade to Lifetime' : 'Upgrade'}
-                  </Link>
+                  <Link to="/upgrade">Upgrade</Link>
                 </Button>
                 <Button
                   variant="outline"
@@ -86,7 +81,7 @@ export const Header = () => {
         </div>
       </header>
       {/* Mobile dates left indicator */}
-      {showUpgrade && subscriptionType === 'free' && generationCount !== null && (
+      {showUpgrade && accessType === 'free' && generationCount !== null && (
         <div className="sm:hidden flex items-center justify-center gap-1 text-sm text-muted-foreground py-2 bg-muted/50">
           <Percent className="h-4 w-4" />
           <span>{5 - generationCount} dates left</span>

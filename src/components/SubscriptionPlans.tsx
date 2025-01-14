@@ -24,7 +24,7 @@ export function SubscriptionPlans() {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           priceId, 
-          mode: 'payment' // Explicitly set to payment mode for lifetime access
+          mode: 'payment'
         }
       });
 
