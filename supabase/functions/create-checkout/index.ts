@@ -94,7 +94,7 @@ serve(async (req) => {
       success_url: `${req.headers.get('origin')}/`,
       cancel_url: `${req.headers.get('origin')}/`,
       metadata: {
-        user_id: user.id,
+        user_id: user.id, // Add user_id to metadata so our webhook can update the correct user
       },
     })
 
