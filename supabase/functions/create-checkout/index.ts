@@ -78,7 +78,10 @@ serve(async (req) => {
       customerId = newCustomer.id
     }
 
-    console.log('Creating checkout session')
+    // Important: Use 'payment' mode for lifetime access, 'subscription' for recurring
+    const checkoutMode = mode || 'payment' // Default to payment mode for lifetime access
+    console.log('Creating checkout session with mode:', checkoutMode)
+    
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
@@ -87,7 +90,7 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
-      mode: mode,
+      mode: checkoutMode,
       success_url: `${req.headers.get('origin')}/`,
       cancel_url: `${req.headers.get('origin')}/`,
       metadata: {

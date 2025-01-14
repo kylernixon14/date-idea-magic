@@ -22,7 +22,10 @@ export function SubscriptionPlans() {
       console.log('Creating checkout session with priceId:', priceId);
       
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId, mode: 'payment' }
+        body: { 
+          priceId, 
+          mode: 'payment' // Explicitly set to payment mode for lifetime access
+        }
       });
 
       if (error) {
