@@ -29,15 +29,15 @@ const Login = () => {
       if (event === "SIGNED_IN") {
         console.log("User signed in, redirecting to home");
         navigate("/");
-      } else if (event === "USER_UPDATED") {
+      } else if (event === "SIGNED_UP") {
         console.log("New user signed up");
         toast({
           title: "Welcome to DateGen!",
           description: "Your account has been created successfully.",
         });
         navigate("/");
-      } else if (event === "USER_UPDATED") {
-        console.log("User updated");
+      } else if (event === "TOKEN_REFRESHED") {
+        console.log("Token refreshed");
         const { data: { session }, error } = await supabase.auth.getSession();
         if (session) {
           navigate("/");
