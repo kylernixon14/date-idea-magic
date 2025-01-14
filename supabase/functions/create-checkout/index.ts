@@ -16,6 +16,19 @@ serve(async (req) => {
     const { priceId, mode } = await req.json()
     console.log('Received request for priceId:', priceId, 'mode:', mode)
 
+    // Verify Stripe key is present
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
+    if (!stripeKey) {
+      console.error('Stripe secret key is not configured')
+      return new Response(
+        JSON.stringify({ error: 'Stripe configuration error' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      )
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
@@ -34,78 +47,109 @@ serve(async (req) => {
         JSON.stringify({ error: 'Unauthorized' }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200, // Changed to 200 to handle error gracefully
+          status: 200,
         }
       )
     }
 
     console.log('Creating checkout for user:', user.id)
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
     })
 
-    const { data: customers } = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    })
-
-    let customerId = customers.data[0]?.id
-
-    if (!customerId) {
-      console.log('Creating new customer for:', user.email)
-      const customer = await stripe.customers.create({
+    try {
+      console.log('Attempting to list customers for email:', user.email)
+      const { data: customers } = await stripe.customers.list({
         email: user.email,
+        limit: 1,
+      })
+
+      let customerId = customers.data[0]?.id
+
+      if (!customerId) {
+        console.log('Creating new customer for:', user.email)
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            user_id: user.id
+          }
+        })
+        customerId = customer.id
+        console.log('Created new customer with ID:', customerId)
+      } else {
+        console.log('Found existing customer:', customerId)
+      }
+
+      console.log('Creating checkout session with:', {
+        customerId,
+        priceId,
+        mode,
+        userId: user.id
+      })
+      
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: mode,
+        success_url: `${req.headers.get('origin')}/`,
+        cancel_url: `${req.headers.get('origin')}/upgrade`,
         metadata: {
           user_id: user.id
         }
       })
-      customerId = customer.id
-    }
 
-    console.log('Creating checkout session for customer:', customerId)
-    
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: mode,
-      success_url: `${req.headers.get('origin')}/`,
-      cancel_url: `${req.headers.get('origin')}/upgrade`,
-      metadata: {
-        user_id: user.id
+      console.log('Checkout session response:', session)
+      
+      if (!session?.url) {
+        console.error('No URL in session response:', session)
+        return new Response(
+          JSON.stringify({ 
+            error: 'No checkout URL returned',
+            details: 'Session created but URL is missing'
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+          }
+        )
       }
-    })
 
-    console.log('Checkout session created:', session)
-    if (!session?.url) {
       return new Response(
-        JSON.stringify({ error: 'No checkout URL returned' }),
+        JSON.stringify({ url: session.url }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200, // Changed to 200 to handle error gracefully
+          status: 200,
+        }
+      )
+    } catch (stripeError) {
+      console.error('Stripe API error:', stripeError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Stripe API error',
+          details: stripeError.message
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
         }
       )
     }
-
-    return new Response(
-      JSON.stringify({ url: session.url }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    )
   } catch (error) {
     console.error('Error in create-checkout:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: 'Server error',
+        details: error.message
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200, // Changed to 200 to handle error gracefully
+        status: 200,
       }
     )
   }
