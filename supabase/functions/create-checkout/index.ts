@@ -16,7 +16,6 @@ serve(async (req) => {
     const { priceId, mode } = await req.json()
     console.log('Received request for priceId:', priceId, 'mode:', mode)
 
-    // Get the user's session
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
@@ -31,7 +30,13 @@ serve(async (req) => {
 
     if (userError || !user) {
       console.error('Error getting user:', userError)
-      throw new Error('Unauthorized')
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200, // Changed to 200 to handle error gracefully
+        }
+      )
     }
 
     console.log('Creating checkout for user:', user.id)
@@ -40,7 +45,6 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    // Check if customer already exists
     const { data: customers } = await stripe.customers.list({
       email: user.email,
       limit: 1,
@@ -48,7 +52,6 @@ serve(async (req) => {
 
     let customerId = customers.data[0]?.id
 
-    // Create new customer if doesn't exist
     if (!customerId) {
       console.log('Creating new customer for:', user.email)
       const customer = await stripe.customers.create({
@@ -79,7 +82,15 @@ serve(async (req) => {
     })
 
     console.log('Checkout session created:', session)
-    if (!session?.url) throw new Error('No checkout URL returned')
+    if (!session?.url) {
+      return new Response(
+        JSON.stringify({ error: 'No checkout URL returned' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200, // Changed to 200 to handle error gracefully
+        }
+      )
+    }
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -94,7 +105,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: 200, // Changed to 200 to handle error gracefully
       }
     )
   }
