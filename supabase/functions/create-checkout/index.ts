@@ -81,6 +81,9 @@ serve(async (req) => {
       }
     })
 
+    console.log('Checkout session created:', session)
+    if (!session?.url) throw new Error('No checkout URL returned');
+
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
