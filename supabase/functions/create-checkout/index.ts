@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const { priceId, mode } = await req.json()
-    console.log('Received request for priceId:', priceId, 'mode:', mode)
+    console.log('Received request with:', { priceId, mode })
 
     // Verify Stripe key is present
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
