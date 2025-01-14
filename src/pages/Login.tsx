@@ -4,6 +4,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -21,6 +22,30 @@ const Login = () => {
     plexMonoLink.rel = "stylesheet";
     document.head.appendChild(plexMonoLink);
 
+    const handleAuthError = (error: AuthError) => {
+      console.error("Auth error:", error);
+      
+      if (error.message.includes("User already registered")) {
+        toast({
+          title: "Account exists",
+          description: "This email is already registered. Please sign in instead.",
+          variant: "destructive",
+        });
+      } else if (error.message.includes("Invalid login credentials")) {
+        toast({
+          title: "Invalid credentials",
+          description: "Please check your email and password and try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Authentication error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    };
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -29,7 +54,7 @@ const Login = () => {
       if (event === "SIGNED_IN") {
         console.log("User signed in, redirecting to home");
         navigate("/");
-      } else if (event === "SIGNED_UP") {
+      } else if (event === "USER_UPDATED" && session?.user) {
         console.log("New user signed up");
         toast({
           title: "Welcome to DateGen!",
@@ -43,13 +68,15 @@ const Login = () => {
           navigate("/");
         }
         if (error) {
-          console.error("Session check error:", error);
-          toast({
-            title: "Error",
-            description: "There was a problem with your account. Please try again.",
-            variant: "destructive",
-          });
+          handleAuthError(error);
         }
+      }
+    });
+
+    // Add error listener for auth errors
+    const authErrorListener = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "USER_DELETED" || event === "SIGNED_OUT") {
+        console.log("Auth error or sign out:", event);
       }
     });
 
@@ -61,7 +88,7 @@ const Login = () => {
         navigate("/");
       }
       if (error) {
-        console.error("Session check error:", error);
+        handleAuthError(error);
       }
     };
 
@@ -69,6 +96,7 @@ const Login = () => {
 
     return () => {
       subscription.unsubscribe();
+      authErrorListener.data.subscription.unsubscribe();
       document.head.removeChild(jakartaLink);
       document.head.removeChild(plexMonoLink);
     };
