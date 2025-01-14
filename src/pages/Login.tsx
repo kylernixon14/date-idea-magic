@@ -74,9 +74,9 @@ const Login = () => {
     });
 
     // Add error listener for auth errors
-    const authErrorListener = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "USER_DELETED" || event === "SIGNED_OUT") {
-        console.log("Auth error or sign out:", event);
+    const authErrorListener = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        console.log("User signed out");
       }
     });
 
