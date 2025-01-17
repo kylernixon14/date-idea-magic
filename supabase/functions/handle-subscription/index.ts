@@ -1,128 +1,98 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import Stripe from 'https://esm.sh/stripe@14.21.0'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-  apiVersion: '2023-10-16',
-})
-
-const supabaseClient = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-)
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 serve(async (req) => {
-  const signature = req.headers.get('stripe-signature')
-  
-  if (!signature) {
-    console.error('No stripe signature found in webhook request')
-    return new Response('No signature', { status: 400 })
+  // Handle CORS
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const body = await req.text()
-    const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
-    
-    if (!endpointSecret) {
-      console.error('Missing Stripe webhook secret')
-      throw new Error('Missing Stripe webhook secret')
+    // Get the stripe signature from headers
+    const signature = req.headers.get('stripe-signature')
+    if (!signature) {
+      console.error('No stripe signature found')
+      throw new Error('No stripe signature found')
     }
 
-    console.log('Constructing Stripe event with signature:', signature.substring(0, 20) + '...')
+    // Get the raw body as text
+    const body = await req.text()
     
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+    })
+
+    // Verify the webhook signature
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
+    if (!webhookSecret) {
+      console.error('Missing webhook secret')
+      throw new Error('Missing webhook secret')
+    }
+
+    console.log('Constructing event with signature:', signature)
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
-      endpointSecret
+      webhookSecret
     )
 
-    console.log('Processing event:', event.type)
+    console.log('Event type:', event.type)
 
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object
-        const userId = session.metadata?.user_id
-
-        if (!userId) {
-          console.error('No user ID in metadata')
-          throw new Error('No user ID in metadata')
-        }
-
-        console.log('Updating access for user:', userId)
-        // For a one-time payment (mode: 'payment'), set access to 'lifetime'
-        // For a subscription (mode: 'subscription'), set access to 'premium'
-        const accessType = session.mode === 'subscription' ? 'premium' : 'lifetime'
-        
-        const { error: updateError } = await supabaseClient
-          .from('user_access')
-          .update({ 
-            access_type: accessType,
-            access_status: 'active',
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', userId)
-
-        if (updateError) {
-          console.error('Error updating access:', updateError)
-          throw updateError
-        }
-
-        console.log('Successfully updated access for user:', userId)
-        break
+    // Handle the checkout.session.completed event
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object
+      console.log('Processing completed checkout session:', session.id)
+      
+      // Get the user ID from metadata
+      const userId = session.metadata?.user_id
+      if (!userId) {
+        console.error('No user ID in metadata')
+        throw new Error('No user ID in metadata')
       }
 
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object
-        const customer = await stripe.customers.retrieve(subscription.customer as string)
-        
-        if (!customer || typeof customer === 'string' || !customer.email) {
-          console.error('Invalid customer data')
-          throw new Error('Invalid customer data')
-        }
+      console.log('Updating access for user:', userId)
 
-        console.log('Finding user for customer email:', customer.email)
-        const { data: users, error: userError } = await supabaseClient
-          .from('profiles')
-          .select('id')
-          .eq('email', customer.email)
-          .limit(1)
+      // Create Supabase client
+      const supabaseClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      )
 
-        if (userError || !users?.length) {
-          console.error('Error finding user:', userError)
-          throw new Error('User not found')
-        }
+      // Update user access
+      const { error: updateError } = await supabaseClient
+        .from('user_access')
+        .update({ 
+          access_type: 'lifetime',
+          stripe_customer_id: session.customer,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId)
 
-        console.log('Updating access status for user:', users[0].id)
-        const { error: updateError } = await supabaseClient
-          .from('user_access')
-          .update({ 
-            access_type: 'free',
-            access_status: 'cancelled',
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', users[0].id)
-
-        if (updateError) {
-          console.error('Error updating access:', updateError)
-          throw updateError
-        }
-
-        console.log('Successfully updated access status for user:', users[0].id)
-        break
+      if (updateError) {
+        console.error('Error updating user access:', updateError)
+        throw updateError
       }
+
+      console.log('Successfully updated access for user:', userId)
     }
 
     return new Response(JSON.stringify({ received: true }), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
   } catch (err) {
-    console.error('Error processing webhook:', err)
+    console.error('Error:', err)
     return new Response(
       JSON.stringify({ error: err.message }),
-      { status: 400 }
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400 
+      }
     )
   }
 })
