@@ -48,14 +48,16 @@ serve(async (req) => {
           throw new Error('No user ID in metadata')
         }
 
-        console.log('Updating subscription for user:', userId)
-        const subscriptionType = session.mode === 'subscription' ? 'premium' : 'lifetime'
+        console.log('Updating access for user:', userId)
+        // For a one-time payment (mode: 'payment'), set access to 'lifetime'
+        // For a subscription (mode: 'subscription'), set access to 'premium'
+        const accessType = session.mode === 'subscription' ? 'premium' : 'lifetime'
         
         const { error: updateError } = await supabaseClient
-          .from('user_subscriptions')
+          .from('user_access')
           .update({ 
-            subscription_type: subscriptionType,
-            subscription_status: 'active',
+            access_type: accessType,
+            access_status: 'active',
             stripe_customer_id: session.customer,
             stripe_subscription_id: session.subscription,
             updated_at: new Date().toISOString()
@@ -63,11 +65,11 @@ serve(async (req) => {
           .eq('user_id', userId)
 
         if (updateError) {
-          console.error('Error updating subscription:', updateError)
+          console.error('Error updating access:', updateError)
           throw updateError
         }
 
-        console.log('Successfully updated subscription for user:', userId)
+        console.log('Successfully updated access for user:', userId)
         break
       }
 
@@ -92,22 +94,22 @@ serve(async (req) => {
           throw new Error('User not found')
         }
 
-        console.log('Updating subscription status for user:', users[0].id)
+        console.log('Updating access status for user:', users[0].id)
         const { error: updateError } = await supabaseClient
-          .from('user_subscriptions')
+          .from('user_access')
           .update({ 
-            subscription_type: 'free',
-            subscription_status: 'cancelled',
+            access_type: 'free',
+            access_status: 'cancelled',
             updated_at: new Date().toISOString()
           })
           .eq('user_id', users[0].id)
 
         if (updateError) {
-          console.error('Error updating subscription:', updateError)
+          console.error('Error updating access:', updateError)
           throw updateError
         }
 
-        console.log('Successfully updated subscription status for user:', users[0].id)
+        console.log('Successfully updated access status for user:', users[0].id)
         break
       }
     }
