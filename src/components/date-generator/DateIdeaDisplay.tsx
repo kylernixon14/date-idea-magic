@@ -10,7 +10,7 @@ interface DateIdeaDisplayProps {
 export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
   return (
     <Card className="mt-6 md:mt-8">
-      <CardContent className="pt-6">
+      <CardContent className="p-4 md:p-6">
         {dateIdea && <DateActions dateIdea={dateIdea} />}
         <DateContent dateIdea={dateIdea} isLoading={isLoading} />
       </CardContent>
