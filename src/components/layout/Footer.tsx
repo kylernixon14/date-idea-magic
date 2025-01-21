@@ -12,7 +12,14 @@ export const Footer = () => {
             <span>{currentYear} Love Your First Year.</span>
           </div>
           <span className="hidden sm:inline">|</span>
-          <span>Terms of Use.</span>
+          <a 
+            href="https://www.loveyourfirstyear.com/dategen-terms" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:text-custom-tan transition-colors"
+          >
+            Terms of Use
+          </a>
           <span className="hidden sm:inline">|</span>
           <div className="flex flex-col sm:flex-row items-center gap-1">
             <span>Questions? Contact us at</span>

@@ -22,7 +22,7 @@ export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
     const pdfContent = document.createElement('div');
     
     const headerImg = document.createElement('img');
-    headerImg.src = '/lovable-uploads/e3bf33d1-9a32-48aa-b380-008f0f5b9562.png';
+    headerImg.src = '/lovable-uploads/8d683fb8-c6e4-4323-b55c-49cf29ec063e.png';
     headerImg.style.width = '100%';
     headerImg.style.maxWidth = '700px';
     headerImg.style.height = 'auto';
@@ -36,7 +36,7 @@ export function DateIdeaDisplay({ dateIdea, isLoading }: DateIdeaDisplayProps) {
     footer.style.textAlign = 'center';
     footer.style.color = 'rgba(0, 0, 0, 0.5)';
     footer.style.fontSize = '12px';
-    footer.textContent = 'loveyourfirstyear.com';
+    footer.textContent = 'mydategen.com';
     pdfContent.appendChild(footer);
 
     const opt = {

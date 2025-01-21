@@ -84,13 +84,7 @@ export const WelcomeDialog = ({ open, onOpenChange }: WelcomeDialogProps) => {
             <p>Then, if you'd like to upgrade:</p>
             <ul className="list-disc list-inside pl-4 space-y-2">
               <li>
-                you can pay $4.99 for an unlimited monthly membership{" "}
-                <Link to="/upgrade" className="text-custom-orange hover:underline">
-                  (upgrade now)
-                </Link>
-              </li>
-              <li>
-                or $39 for an unlimited LIFETIME membership{" "}
+                you can get unlimited LIFETIME access for just $39{" "}
                 <Link to="/upgrade" className="text-custom-orange hover:underline">
                   (upgrade now)
                 </Link>
