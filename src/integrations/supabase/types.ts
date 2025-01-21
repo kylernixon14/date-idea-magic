@@ -74,28 +74,58 @@ export type Database = {
       }
       date_generations: {
         Row: {
+          budget: number | null
           content: string | null
           created_at: string
           description: string | null
+          energy_level: number | null
+          hobbies: string[] | null
           id: string
           ip_address: string
+          partner_love_language: string | null
+          relationship_status: string | null
+          time_available: string | null
+          time_of_day: string | null
           user_id: string | null
+          vibes: string[] | null
+          weather: string | null
+          your_love_language: string | null
         }
         Insert: {
+          budget?: number | null
           content?: string | null
           created_at?: string
           description?: string | null
+          energy_level?: number | null
+          hobbies?: string[] | null
           id?: string
           ip_address: string
+          partner_love_language?: string | null
+          relationship_status?: string | null
+          time_available?: string | null
+          time_of_day?: string | null
           user_id?: string | null
+          vibes?: string[] | null
+          weather?: string | null
+          your_love_language?: string | null
         }
         Update: {
+          budget?: number | null
           content?: string | null
           created_at?: string
           description?: string | null
+          energy_level?: number | null
+          hobbies?: string[] | null
           id?: string
           ip_address?: string
+          partner_love_language?: string | null
+          relationship_status?: string | null
+          time_available?: string | null
+          time_of_day?: string | null
           user_id?: string | null
+          vibes?: string[] | null
+          weather?: string | null
+          your_love_language?: string | null
         }
         Relationships: []
       }

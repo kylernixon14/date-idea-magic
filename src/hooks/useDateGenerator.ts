@@ -66,6 +66,29 @@ export const useDateGenerator = () => {
 
       console.log('Calling generate-date function with formData:', formData);
       
+      // First, insert the date generation record
+      const { error: insertError } = await supabase
+        .from('date_generations')
+        .insert({
+          relationship_status: formData.relationshipStatus,
+          budget: formData.budget,
+          time_available: formData.timeAvailable,
+          vibes: formData.vibes,
+          your_love_language: formData.yourLoveLanguage,
+          partner_love_language: formData.partnerLoveLanguage,
+          weather: formData.weather,
+          time_of_day: formData.timeOfDay,
+          energy_level: formData.energyLevel,
+          hobbies: formData.hobbies,
+          ip_address: '0.0.0.0', // This is required but we're using a placeholder
+        });
+
+      if (insertError) {
+        console.error('Error inserting date generation:', insertError);
+        throw new Error("Failed to save date generation");
+      }
+
+      // Then call the generate-date function
       const { data, error } = await supabase.functions.invoke('generate-date', {
         body: { formData }
       });
