@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Load Plus Jakarta Sans font
@@ -102,6 +103,9 @@ const Login = () => {
     };
   }, [navigate]);
 
+  // Determine if we should show sign up by default
+  const shouldShowSignUp = location.hash === '#signup';
+
   return (
     <div className="min-h-screen flex">
       {/* Left side - Auth form */}
@@ -118,6 +122,7 @@ const Login = () => {
           </div>
           <Auth
             supabaseClient={supabase}
+            view={shouldShowSignUp ? "sign_up" : "sign_in"}
             appearance={{
               theme: ThemeSupa,
               style: {
