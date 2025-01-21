@@ -52,14 +52,9 @@ const handler = async (req: Request): Promise<Response> => {
 
             <p>Then, if you'd like to upgrade:</p>
             <ul style="list-style-type: none; padding-left: 0;">
-              <li style="margin-bottom: 10px;">
-                <a href="https://dategen.app/upgrade?plan=monthly" style="color: #e45e41; text-decoration: underline;">
-                  - you can pay $4.99 for an unlimited monthly membership
-                </a>
-              </li>
               <li>
-                <a href="https://dategen.app/upgrade?plan=lifetime" style="color: #e45e41; text-decoration: underline;">
-                  - or $39 for an unlimited LIFETIME membership
+                <a href="https://mydategen.com/upgrade" style="color: #e45e41; text-decoration: underline;">
+                  - get unlimited LIFETIME access for just $39
                 </a>
               </li>
             </ul>
