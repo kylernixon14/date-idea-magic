@@ -103,8 +103,9 @@ const Login = () => {
     };
   }, [navigate]);
 
-  // Determine if we should show sign up by default
+  // Get the current hash and determine if we should show sign up
   const shouldShowSignUp = location.hash === '#signup';
+  console.log("Current hash:", location.hash, "Should show signup:", shouldShowSignUp);
 
   return (
     <div className="min-h-screen flex">
