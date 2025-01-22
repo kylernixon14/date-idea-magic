@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
@@ -9,6 +9,14 @@ import { AuthError } from "@supabase/supabase-js";
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [view, setView] = useState<"sign_in" | "sign_up">("sign_in");
+
+  useEffect(() => {
+    // Update view when hash changes
+    const shouldShowSignUp = location.hash === '#signup';
+    console.log("Hash changed. Current hash:", location.hash, "Setting view to:", shouldShowSignUp ? "sign_up" : "sign_in");
+    setView(shouldShowSignUp ? "sign_up" : "sign_in");
+  }, [location.hash]);
 
   useEffect(() => {
     // Load Plus Jakarta Sans font
@@ -103,10 +111,6 @@ const Login = () => {
     };
   }, [navigate]);
 
-  // Get the current hash and determine if we should show sign up
-  const shouldShowSignUp = location.hash === '#signup';
-  console.log("Current hash:", location.hash, "Should show signup:", shouldShowSignUp);
-
   return (
     <div className="min-h-screen flex">
       {/* Left side - Auth form */}
@@ -123,7 +127,7 @@ const Login = () => {
           </div>
           <Auth
             supabaseClient={supabase}
-            view={shouldShowSignUp ? "sign_up" : "sign_in"}
+            view={view}
             appearance={{
               theme: ThemeSupa,
               style: {
