@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AuthError } from "@supabase/supabase-js";
 
-const Login = () => {
+const SignUp = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,12 +25,13 @@ const Login = () => {
     const handleAuthError = (error: AuthError) => {
       console.error("Auth error:", error);
       
-      if (error.message.includes("Invalid login credentials")) {
+      if (error.message.includes("User already registered")) {
         toast({
-          title: "Invalid credentials",
-          description: "Please check your email and password and try again.",
+          title: "Account exists",
+          description: "This email is already registered. Please sign in instead.",
           variant: "destructive",
         });
+        navigate("/login");
       } else {
         toast({
           title: "Authentication error",
@@ -43,20 +44,15 @@ const Login = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed in Login:", event, session?.user?.id);
+      console.log("Auth state changed in SignUp:", event, session?.user?.id);
       
-      if (event === "SIGNED_IN") {
-        console.log("User signed in, redirecting to home");
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+        console.log("User signed up successfully");
+        toast({
+          title: "Welcome to DateGen!",
+          description: "Your account has been created successfully.",
+        });
         navigate("/");
-      } else if (event === "TOKEN_REFRESHED") {
-        console.log("Token refreshed");
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (session) {
-          navigate("/");
-        }
-        if (error) {
-          handleAuthError(error);
-        }
       }
     });
 
@@ -92,12 +88,12 @@ const Login = () => {
                 <path d="M20 0L24.4903 15.5097L40 20L24.4903 24.4903L20 40L15.5097 24.4903L0 20L15.5097 15.5097L20 0Z" fill="#e45e41"/>
               </svg>
             </div>
-            <h1 className="text-2xl font-semibold mb-2 font-jakarta">Welcome Back to DateGen</h1>
-            <p className="text-gray-600 font-jakarta">Need an account? <a href="/signup" className="text-[#e45e41] hover:underline">Sign up</a></p>
+            <h1 className="text-2xl font-semibold mb-2 font-jakarta">Create Your DateGen Account</h1>
+            <p className="text-gray-600 font-jakarta">Already have an account? <a href="/login" className="text-[#e45e41] hover:underline">Sign in</a></p>
           </div>
           <Auth
             supabaseClient={supabase}
-            view="sign_in"
+            view="sign_up"
             appearance={{
               theme: ThemeSupa,
               style: {
@@ -148,4 +144,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
