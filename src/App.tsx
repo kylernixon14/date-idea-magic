@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
@@ -17,11 +17,9 @@ function App() {
         <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
           <Routes>
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/login/*" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
             <Route path="/bookmarked-dates" element={<ProtectedRoute><BookmarkedDates /></ProtectedRoute>} />
-            {/* Catch any unmatched routes and redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Toaster />
         </ThemeProvider>
