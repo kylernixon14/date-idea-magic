@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,16 @@ import { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [view, setView] = useState<"sign_in" | "sign_up">("sign_in");
+
+  useEffect(() => {
+    // Check for signup parameter in URL
+    const searchParams = new URLSearchParams(location.search);
+    const showSignUp = searchParams.get('signup') === 'true';
+    console.log("Checking URL params. Show signup:", showSignUp);
+    setView(showSignUp ? "sign_up" : "sign_in");
+  }, [location.search]);
 
   useEffect(() => {
     // Load Plus Jakarta Sans font
@@ -25,7 +35,13 @@ const Login = () => {
     const handleAuthError = (error: AuthError) => {
       console.error("Auth error:", error);
       
-      if (error.message.includes("Invalid login credentials")) {
+      if (error.message.includes("User already registered")) {
+        toast({
+          title: "Account exists",
+          description: "This email is already registered. Please sign in instead.",
+          variant: "destructive",
+        });
+      } else if (error.message.includes("Invalid login credentials")) {
         toast({
           title: "Invalid credentials",
           description: "Please check your email and password and try again.",
@@ -48,6 +64,13 @@ const Login = () => {
       if (event === "SIGNED_IN") {
         console.log("User signed in, redirecting to home");
         navigate("/");
+      } else if (event === "USER_UPDATED" && session?.user) {
+        console.log("New user signed up");
+        toast({
+          title: "Welcome to DateGen!",
+          description: "Your account has been created successfully.",
+        });
+        navigate("/");
       } else if (event === "TOKEN_REFRESHED") {
         console.log("Token refreshed");
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -57,6 +80,13 @@ const Login = () => {
         if (error) {
           handleAuthError(error);
         }
+      }
+    });
+
+    // Add error listener for auth errors
+    const authErrorListener = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        console.log("User signed out");
       }
     });
 
@@ -76,6 +106,7 @@ const Login = () => {
 
     return () => {
       subscription.unsubscribe();
+      authErrorListener.data.subscription.unsubscribe();
       document.head.removeChild(jakartaLink);
       document.head.removeChild(plexMonoLink);
     };
@@ -92,12 +123,12 @@ const Login = () => {
                 <path d="M20 0L24.4903 15.5097L40 20L24.4903 24.4903L20 40L15.5097 24.4903L0 20L15.5097 15.5097L20 0Z" fill="#e45e41"/>
               </svg>
             </div>
-            <h1 className="text-2xl font-semibold mb-2 font-jakarta">Welcome Back to DateGen</h1>
-            <p className="text-gray-600 font-jakarta">Need an account? <a href="/signup" className="text-[#e45e41] hover:underline">Sign up</a></p>
+            <h1 className="text-2xl font-semibold mb-2 font-jakarta">Welcome to DateGen</h1>
+            <p className="text-gray-600 font-jakarta">Sign in to your account or create a new one</p>
           </div>
           <Auth
             supabaseClient={supabase}
-            view="sign_in"
+            view={view}
             appearance={{
               theme: ThemeSupa,
               style: {
