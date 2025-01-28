@@ -12,14 +12,6 @@ const Login = () => {
   const [view, setView] = useState<"sign_in" | "sign_up">("sign_in");
 
   useEffect(() => {
-    // Check for signup parameter in URL
-    const searchParams = new URLSearchParams(location.search);
-    const showSignUp = searchParams.get('signup') === 'true';
-    console.log("Checking URL params. Show signup:", showSignUp);
-    setView(showSignUp ? "sign_up" : "sign_in");
-  }, [location.search]);
-
-  useEffect(() => {
     // Load Plus Jakarta Sans font
     const jakartaLink = document.createElement("link");
     jakartaLink.href = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap";
@@ -124,7 +116,15 @@ const Login = () => {
               </svg>
             </div>
             <h1 className="text-2xl font-semibold mb-2 font-jakarta">Welcome to DateGen</h1>
-            <p className="text-gray-600 font-jakarta">Sign in to your account or create a new one</p>
+            <p className="text-gray-600 font-jakarta">
+              {view === "sign_in" ? "Sign in to your account" : "Create your account"}
+            </p>
+            <button
+              onClick={() => setView(view === "sign_in" ? "sign_up" : "sign_in")}
+              className="mt-2 text-[#e45e41] hover:underline font-jakarta text-sm"
+            >
+              {view === "sign_in" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+            </button>
           </div>
           <Auth
             supabaseClient={supabase}
