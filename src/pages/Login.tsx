@@ -12,30 +12,12 @@ const Login = () => {
   const [view, setView] = useState<"sign_in" | "sign_up">("sign_in");
 
   useEffect(() => {
-    // Handle clicks on signup links
-    const handleSignupLinks = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const signupLink = target.closest('a[href*="#signup"]');
-      if (signupLink) {
-        e.preventDefault();
-        console.log("Signup link clicked, updating view to sign_up");
-        setView("sign_up");
-        window.history.pushState({}, '', '/login#signup');
-      }
-    };
-
-    // Add event listener
-    document.addEventListener('click', handleSignupLinks);
-
-    // Update view when hash changes
-    const shouldShowSignUp = location.hash === '#signup';
-    console.log("Hash changed. Current hash:", location.hash, "Setting view to:", shouldShowSignUp ? "sign_up" : "sign_in");
-    setView(shouldShowSignUp ? "sign_up" : "sign_in");
-
-    return () => {
-      document.removeEventListener('click', handleSignupLinks);
-    };
-  }, [location.hash]);
+    // Check for signup parameter in URL
+    const searchParams = new URLSearchParams(location.search);
+    const showSignUp = searchParams.get('signup') === 'true';
+    console.log("Checking URL params. Show signup:", showSignUp);
+    setView(showSignUp ? "sign_up" : "sign_in");
+  }, [location.search]);
 
   useEffect(() => {
     // Load Plus Jakarta Sans font
