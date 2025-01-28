@@ -9,8 +9,8 @@ export const formSchema = z.object({
   budget: z.number().min(0),
   timeAvailable: z.string(),
   vibes: z.array(z.string()),
-  yourLoveLanguage: z.string(),
-  partnerLoveLanguage: z.string(),
+  yourLoveLanguage: z.string().optional(), // Made optional
+  partnerLoveLanguage: z.string().optional(), // Made optional
   weather: z.string(),
   timeOfDay: z.string().optional(),
   energyLevel: z.number().min(0).max(4).optional(),
