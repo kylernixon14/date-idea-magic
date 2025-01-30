@@ -24,7 +24,7 @@ export function SubscriptionPlans() {
       
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
-          priceId: 'price_1Ow2xtADvTv7NPPxNbWXHGGK', // Updated price ID
+          priceId: 'price_1Qm3spADvTv7NPPxtgXOPjDT', // Updated to correct price ID
           mode: 'payment'
         }
       });
@@ -106,7 +106,7 @@ export function SubscriptionPlans() {
         <CardFooter>
           <Button 
             className="w-full py-6 bg-custom-orange hover:bg-custom-orange/90"
-            onClick={() => handleSubscribe('price_1Ow2xtADvTv7NPPxNbWXHGGK')}
+            onClick={() => handleSubscribe('price_1Qm3spADvTv7NPPxtgXOPjDT')}
           >
             Get Lifetime Access
           </Button>
