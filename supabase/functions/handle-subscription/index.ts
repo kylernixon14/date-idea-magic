@@ -76,15 +76,21 @@ serve(async (req) => {
         throw updateError
       }
 
-      // Get user email
+      // Get user data from profiles table
       const { data: userData, error: userError } = await supabaseClient
         .from("profiles")
-        .select("full_name")
+        .select("full_name, email")
         .eq("id", userId)
         .single()
 
       if (userError) {
         console.error("Error fetching user data:", userError)
+        throw userError
+      }
+
+      if (!userData.email) {
+        console.error("No email found for user:", userId)
+        throw new Error("No email found for user")
       }
 
       // Send confirmation email
@@ -98,8 +104,8 @@ serve(async (req) => {
               "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
             },
             body: JSON.stringify({
-              email: session.customer_details?.email,
-              name: userData?.full_name,
+              email: userData.email,
+              name: userData.full_name,
             }),
           }
         )
