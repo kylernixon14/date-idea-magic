@@ -19,6 +19,7 @@ export function SubscriptionPlans() {
         return;
       }
 
+      console.log('Starting checkout process...');
       console.log('Creating checkout session with priceId:', priceId);
       
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -32,13 +33,17 @@ export function SubscriptionPlans() {
         console.error('Error from create-checkout function:', error);
         throw error;
       }
+
+      console.log('Checkout response:', data);
       
-      console.log('Checkout session created:', data);
-      if (!data?.url) throw new Error('No checkout URL returned');
+      if (!data?.url) {
+        console.error('No checkout URL in response:', data);
+        throw new Error('Invalid checkout session response');
+      }
 
       window.location.href = data.url;
     } catch (error) {
-      console.error('Error creating checkout session:', error);
+      console.error('Error in checkout process:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to start checkout process",
