@@ -20,7 +20,7 @@ serve(async (req) => {
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
     if (!stripeKey) {
       console.error('Stripe secret key is missing')
-      throw new Error('Configuration error')
+      throw new Error('Configuration error: Stripe secret key is missing')
     }
 
     // Get the authorization header
@@ -78,9 +78,8 @@ serve(async (req) => {
       customerId = newCustomer.id
     }
 
-    // Important: Use 'payment' mode for lifetime access, 'subscription' for recurring
-    const checkoutMode = mode || 'payment' // Default to payment mode for lifetime access
-    console.log('Creating checkout session with mode:', checkoutMode)
+    // Important: Use 'payment' mode for lifetime access
+    console.log('Creating checkout session with mode: payment')
     
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -90,16 +89,20 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
-      mode: checkoutMode,
+      mode: 'payment',
       success_url: `${req.headers.get('origin')}/`,
       cancel_url: `${req.headers.get('origin')}/`,
       metadata: {
-        user_id: user.id, // Add user_id to metadata so our webhook can update the correct user
+        user_id: user.id,
       },
     })
 
     console.log('Checkout session created:', session.id)
     console.log('Checkout URL:', session.url)
+
+    if (!session.url) {
+      throw new Error('Stripe session URL is missing')
+    }
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -117,7 +120,7 @@ serve(async (req) => {
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200, // Keeping 200 to allow client-side error handling
+        status: 400,
       }
     )
   }
