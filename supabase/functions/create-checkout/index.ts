@@ -95,6 +95,7 @@ serve(async (req) => {
       metadata: {
         user_id: user.id,
       },
+      allow_promotion_codes: true, // Enable coupon support
     })
 
     console.log('Checkout session created:', session.id)
